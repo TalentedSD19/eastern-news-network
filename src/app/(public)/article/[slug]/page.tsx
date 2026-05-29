@@ -9,6 +9,7 @@ import SiteFooter from "@/components/public/SiteFooter";
 import ArticleBody from "@/components/public/ArticleBody";
 import ViewTracker from "@/components/public/ViewTracker";
 import VoteBar from "@/components/public/VoteBar";
+import ShareBar from "@/components/public/ShareBar";
 import CommentSection from "@/components/public/CommentSection";
 import TweetEmbed from "@/components/public/TweetEmbed";
 import { formatDateTimeIST } from "@/lib/utils";
@@ -202,6 +203,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
             </div>
           )}
+
+          {/* ── Share ── */}
+          <ShareBar title={article.title} />
 
           {/* ── Vote section — prominently at bottom ── */}
           <VoteBar articleId={article.id} initialUp={initialUp} initialDown={initialDown} />
