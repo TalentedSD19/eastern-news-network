@@ -16,8 +16,6 @@ export default function CropModal({ src, onDone, onClose }: Props) {
   const [completed, setCompleted] = useState<PixelCrop | null>(null);
   const [applying, setApplying] = useState(false);
 
-  // Set an initial completed crop (full image) as soon as the image renders,
-  // so "Apply Crop" is clickable without requiring the user to drag first.
   function handleImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     const img = e.currentTarget;
     setCompleted({ unit: "px", x: 0, y: 0, width: img.width, height: img.height });
@@ -73,12 +71,7 @@ export default function CropModal({ src, onDone, onClose }: Props) {
         </div>
 
         <div className="p-4 max-h-[62vh] overflow-auto bg-gray-50 flex items-center justify-center">
-          <ReactCrop
-            crop={crop}
-            onChange={setCrop}
-            onComplete={setCompleted}
-            keepSelection
-          >
+          <ReactCrop crop={crop} onChange={setCrop} onComplete={setCompleted} keepSelection>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               ref={imgRef}

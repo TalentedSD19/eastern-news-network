@@ -52,7 +52,8 @@
 /* ── Inline article images ── */
 .prose img {
   display: block !important;
-  width: 50% !important;
+  width: 50%;           /* default; overridden by inline style when user sets a size */
+  max-width: 100% !important;   /* always responsive — never overflows the column */
   margin-left: auto !important;
   margin-right: auto !important;
 }
