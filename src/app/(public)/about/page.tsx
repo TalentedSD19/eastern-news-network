@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
 
@@ -107,26 +108,42 @@ export default function AboutPage() {
           </div>
 
           {/* Editor contact */}
-          <div>
-            <p className="font-serif text-2xl text-gray-950 mb-1">Prasanta Paul</p>
-            <p className="text-[11px] font-black uppercase tracking-[0.15em] text-brand-red mb-4">
-              Editor, India
-            </p>
-            <div className="space-y-1 text-sm text-gray-500">
-              <p>
-                <a
-                  href="mailto:journo41@gmail.com"
-                  className="hover:text-brand-red transition-colors"
-                >
-                  journo41@gmail.com
-                </a>
-              </p>
-              <p>
-                <a href="tel:+919433005558" className="hover:text-brand-red transition-colors">
-                  +91 94330 05558
-                </a>
-              </p>
+          <div className="flex items-center gap-6">
+
+            {/* Portrait */}
+            <div className="shrink-0 w-24 h-24 rounded-full overflow-hidden ring-1 ring-gray-200">
+              <Image
+                src="/prasanta_profile_image.jpg"
+                alt="Prasanta Paul"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover object-top"
+              />
             </div>
+
+            {/* Name + contact */}
+            <div>
+              <p className="font-serif text-2xl text-gray-950 mb-0.5">Prasanta Paul</p>
+              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-brand-red mb-3">
+                Editor, India
+              </p>
+              <div className="space-y-1 text-sm text-gray-500">
+                <p>
+                  <a
+                    href="mailto:journo41@gmail.com"
+                    className="hover:text-brand-red transition-colors"
+                  >
+                    journo41@gmail.com
+                  </a>
+                </p>
+                <p>
+                  <a href="tel:+919433005558" className="hover:text-brand-red transition-colors">
+                    +91 94330 05558
+                  </a>
+                </p>
+              </div>
+            </div>
+
           </div>
 
         </div>

@@ -11,12 +11,21 @@ const ALLOWED: sanitizeHtml.IOptions = {
   ],
   allowedAttributes: {
     a: ["href", "target", "rel"],
-    img: ["src", "alt", "width", "height", "class"],
+    img: ["src", "alt", "width", "height", "class", "style"],
     figure: ["class"],
     figcaption: ["class"],
   },
+  // Allow width/height inline styles on images so editor-resized images
+  // render at the correct size. Only these two properties are permitted.
+  allowedStyles: {
+    img: {
+      width: [/^\d+px$/],
+      height: [/^\d+px$/],
+    },
+  },
   transformTags: {
-    a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }, false),
+    // merge=true (default) keeps href/target and only sets/overwrites rel
+    a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }),
   },
   allowedSchemes: ["https"],
 };
