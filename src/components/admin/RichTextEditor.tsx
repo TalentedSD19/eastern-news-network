@@ -3,7 +3,7 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import type { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
+import { ResizableImage } from "./ResizableImage";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect } from "react";
@@ -58,7 +58,7 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
     immediatelyRender: false,
     extensions: [
       StarterKit,
-      Image,
+      ResizableImage,
       Link.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: "Write your article here…" }),
     ],

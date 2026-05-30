@@ -21,27 +21,27 @@ export default function AboutPage() {
           </h1>
           <div className="w-10 h-0.5 bg-brand-red mb-8" />
 
-          {/* Opening statement — deck style, matching article subtitles */}
-          <p className="font-serif text-xl sm:text-2xl text-gray-700 leading-relaxed mb-4">
+          {/* Opening statement */}
+          <p className="font-serif text-xl text-gray-700 leading-relaxed mb-4">
             Eastern News Network is an independent news publication catering to a diverse palette
             of news stories and features from the East as also the World.
           </p>
-          <p className="font-serif text-lg text-gray-500 leading-relaxed mb-3">
+          <p className="font-serif text-xl text-gray-700 leading-relaxed mb-4">
             Embedded in communities across the region, delivering ground-level reporting that
             national outlets often miss.
           </p>
-          <p className="font-serif text-base italic text-gray-400 mb-14">
+          <p className="font-serif text-xl text-gray-700 leading-relaxed mb-14">
             The reportage endeavours to deliver stuff where the light is seldom shed.
           </p>
 
           {/* Background section */}
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-4">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-400 mb-4">
             Background
           </p>
           <div className="w-6 h-0.5 bg-brand-red mb-8" />
 
           {/* Narrative — uses the same prose class as ArticleBody */}
-          <div className="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-brand-red mb-14">
+          <div className="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-brand-red prose-strong:font-normal prose-em:not-italic mb-14">
             <p>
               I remember the exact moment the idea first took hold — sitting in a dimly lit room,
               scrolling through headlines that felt distant, disconnected.
@@ -70,7 +70,7 @@ export default function AboutPage() {
               foolishness.
             </p>
             <p>
-              <strong>But a dream doesn&apos;t respond to logic. It only responds to action.</strong>
+              But a dream doesn&apos;t respond to logic. It only responds to action.
             </p>
             <p>
               I kept going. Because Eastern News Network wasn&apos;t just a website to me — it was a
@@ -79,8 +79,8 @@ export default function AboutPage() {
             </p>
             <p>
               One who fought shoulder to shoulder with me is a young, energetic &amp; talented IT
-              &amp; AI wizard. Meet <strong>Soumyajit Datta</strong> who made it happen almost at the
-              blink of an eye. My &lsquo;Kurnish&rsquo; to Datta.
+              &amp; AI wizard. Meet Soumyajit Datta who made it happen almost at the blink of an eye.
+              My &lsquo;Kurnish&rsquo; to Datta.
             </p>
             <p>And then came the morning everything changed.</p>
             <p>
@@ -90,18 +90,14 @@ export default function AboutPage() {
               whispered to myself in moments of doubt, was suddenly real — breathing and blinking on
               screens across the world. The beautiful, overwhelming stillness of arrival.
             </p>
-            <p>
-              <strong>Eastern News Network has gone on air.</strong>
-            </p>
+            <p>Eastern News Network has gone on air.</p>
             <p>There is a particular kind of joy that comes not from applause, but from arrival.</p>
-            <p>
-              <em>Congratulations on bringing ENN to life.</em>
-            </p>
+            <p>Congratulations on bringing ENN to life.</p>
           </div>
 
           {/* Statutory caution — same card style as "About the Author" on article pages */}
           <div className="rounded-sm border border-gray-200 bg-gray-50 px-6 py-5 mb-12">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-400 mb-2">
               Statutory Caution
             </p>
             <p className="text-sm text-gray-600 leading-relaxed">
@@ -112,7 +108,7 @@ export default function AboutPage() {
 
           {/* Editor contact */}
           <div>
-            <p className="font-serif text-2xl font-bold text-gray-950 mb-1">Prasanta Paul</p>
+            <p className="font-serif text-2xl text-gray-950 mb-1">Prasanta Paul</p>
             <p className="text-[11px] font-black uppercase tracking-[0.15em] text-brand-red mb-4">
               Editor, India
             </p>
