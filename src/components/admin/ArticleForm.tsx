@@ -70,6 +70,9 @@ export default function ArticleForm({ article, categories }: Props) {
   const [categoryId, setCategoryId] = useState(article?.categoryId ?? "");
   const [twitterUrl, setTwitterUrl] = useState(article?.twitterUrl ?? "");
   const [aboutAuthors, setAboutAuthors] = useState(article?.aboutAuthors ?? "");
+  const [authorImage, setAuthorImage] = useState(article?.authorImage ?? "/prasanta_profile_image.jpg");
+  const [authorImageUploading, setAuthorImageUploading] = useState(false);
+  const authorImageRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED">(article?.status ?? "DRAFT");
 
   // ── UI state ─────────────────────────────────────────────────────────────
@@ -112,7 +115,7 @@ export default function ArticleForm({ article, categories }: Props) {
             title, slug, subtitle, dateline, isBreaking,
             reporterName, excerpt, body,
             coverImage: images[0]?.url ?? null, images,
-            categoryId, twitterUrl, seoKeywords, aboutAuthors, status,
+            categoryId, twitterUrl, seoKeywords, aboutAuthors, authorImage, status,
           }),
         });
         if (res.ok) {
@@ -131,7 +134,7 @@ export default function ArticleForm({ article, categories }: Props) {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, slug, subtitle, dateline, isBreaking, reporterName, seoKeywords,
-      excerpt, body, images, categoryId, twitterUrl, aboutAuthors, status, article?.id]);
+      excerpt, body, images, categoryId, twitterUrl, aboutAuthors, authorImage, status, article?.id]);
 
   // ── Submit ────────────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
@@ -144,7 +147,7 @@ export default function ArticleForm({ article, categories }: Props) {
       title, slug, subtitle, dateline, isBreaking,
       reporterName, excerpt, body,
       coverImage: images[0]?.url ?? null, images,
-      categoryId, twitterUrl, seoKeywords, aboutAuthors, status,
+      categoryId, twitterUrl, seoKeywords, aboutAuthors, authorImage, status,
     };
 
     const url = article ? `/api/articles/${article.id}` : "/api/articles";
@@ -528,6 +531,63 @@ export default function ArticleForm({ article, categories }: Props) {
           <p className="text-xs text-gray-400">
             Appears at the bottom of the published article. Use a blank line to separate multiple author bios.
           </p>
+        </div>
+
+        {/* Author Photo */}
+        <div className="space-y-2">
+          <Label>Author Photo</Label>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 flex-shrink-0 hover:opacity-75 transition-opacity"
+              onClick={() => authorImageRef.current?.click()}
+              title="Click to change photo"
+            >
+              <Image
+                src={authorImage}
+                alt="Author"
+                fill
+                className="object-cover"
+              />
+            </button>
+            <div className="space-y-1">
+              <button
+                type="button"
+                className="text-sm text-brand-red hover:underline disabled:opacity-50"
+                disabled={authorImageUploading}
+                onClick={() => authorImageRef.current?.click()}
+              >
+                {authorImageUploading ? "Uploading…" : "Change photo"}
+              </button>
+              {authorImage !== "/prasanta_profile_image.jpg" && (
+                <button
+                  type="button"
+                  className="block text-xs text-gray-400 hover:text-gray-600"
+                  onClick={() => setAuthorImage("/prasanta_profile_image.jpg")}
+                >
+                  Reset to default
+                </button>
+              )}
+              <p className="text-xs text-gray-400">Shown in the "About the Author" box.</p>
+            </div>
+          </div>
+          <input
+            ref={authorImageRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              setAuthorImageUploading(true);
+              const form = new FormData();
+              form.append("file", file);
+              const res = await fetch("/api/upload", { method: "POST", body: form });
+              const data = await res.json();
+              setAuthorImageUploading(false);
+              if (res.ok) setAuthorImage(data.url);
+            }}
+          />
         </div>
 
         {/* Status */}

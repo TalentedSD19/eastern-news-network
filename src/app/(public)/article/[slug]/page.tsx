@@ -93,6 +93,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const subtitle = article.subtitle;
   const dateline = article.dateline;
   const aboutAuthors = article.aboutAuthors;
+  const authorImage = article.authorImage;
   const mins = readingTime(article.body);
   const multipleAuthors = aboutAuthors?.includes("\n\n") ?? false;
 
@@ -194,12 +195,22 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
           {/* About the Author(s) */}
           {aboutAuthors && (
-            <div className="mt-12 rounded-sm border border-gray-200 bg-gray-50 px-6 py-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-3">
+            <div className="mt-12 mb-8 border-t-2 border-brand-red pt-8">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-6 text-center">
                 About the {multipleAuthors ? "Authors" : "Author"}
               </p>
-              <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-                {aboutAuthors}
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm flex-shrink-0">
+                  <Image
+                    src={authorImage ?? "/prasanta_profile_image.jpg"}
+                    alt="Author"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed text-justify max-w-xl">
+                  {aboutAuthors}
+                </p>
               </div>
             </div>
           )}

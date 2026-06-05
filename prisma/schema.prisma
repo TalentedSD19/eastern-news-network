@@ -41,6 +41,7 @@ model Article {
   twitterUrl   String?
   seoKeywords  String?
   aboutAuthors String?
+  authorImage  String?
   status       ArticleStatus @default(DRAFT)
   publishedAt  DateTime?
   createdAt    DateTime      @default(now())
