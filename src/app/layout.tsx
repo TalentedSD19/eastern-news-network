@@ -17,8 +17,45 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Eastern News Network",
+  metadataBase: new URL("https://easternnewsnetwork.com"),
+  title: {
+    default: "Eastern News Network",
+    template: "%s | Eastern News Network",
+  },
   description: "Independent news from the East — politics, economy, society, and culture.",
+  openGraph: {
+    siteName: "Eastern News Network",
+    type: "website",
+    locale: "en_IN",
+    url: "https://easternnewsnetwork.com",
+    title: "Eastern News Network",
+    description: "Independent news from the East — politics, economy, society, and culture.",
+    images: [
+      {
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "Eastern News Network",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@EasternNewsNet",
+    title: "Eastern News Network",
+    description: "Independent news from the East — politics, economy, society, and culture.",
+    images: ["/android-chrome-512x512.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },

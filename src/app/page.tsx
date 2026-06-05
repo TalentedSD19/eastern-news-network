@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
@@ -6,6 +7,18 @@ import Pagination from "@/components/public/Pagination";
 import type { ArticleWithRelations } from "@/types";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Eastern News Network",
+  description: "Independent news from the East — politics, economy, society, and culture. Breaking news, analysis, and in-depth coverage.",
+  alternates: {
+    canonical: "https://easternnewsnetwork.com",
+  },
+  openGraph: {
+    url: "https://easternnewsnetwork.com",
+    type: "website",
+  },
+};
 
 const PAGE_SIZE = 12;
 

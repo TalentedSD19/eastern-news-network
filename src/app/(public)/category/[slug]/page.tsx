@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
@@ -7,6 +8,29 @@ import Pagination from "@/components/public/Pagination";
 import type { ArticleWithRelations } from "@/types";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const category = await prisma.category.findUnique({ where: { slug: params.slug } });
+  if (!category) return {};
+
+  const url = `https://easternnewsnetwork.com/category/${params.slug}`;
+  return {
+    title: category.name,
+    description: `Latest news and articles in ${category.name} from Eastern News Network.`,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title: `${category.name} — Eastern News Network`,
+      description: `Latest news and articles in ${category.name} from Eastern News Network.`,
+    },
+    twitter: {
+      card: "summary",
+      title: `${category.name} — Eastern News Network`,
+      description: `Latest news and articles in ${category.name} from Eastern News Network.`,
+    },
+  };
+}
 
 const PAGE_SIZE = 12;
 

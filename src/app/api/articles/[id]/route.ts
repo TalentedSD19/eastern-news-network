@@ -12,7 +12,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const {
     title, slug: slugInput, excerpt, body: content, coverImage, images,
     subtitle, dateline, isBreaking,
-    categoryId, status, reporterName, twitterUrl, seoKeywords, aboutAuthors,
+    categoryId, status, reporterName, twitterUrl, seoKeywords, aboutAuthors, authorImage,
   } = body;
   const resolvedCover = coverImage ?? (Array.isArray(images) && images[0]?.url ? images[0].url : undefined);
 
@@ -57,6 +57,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       ...(twitterUrl !== undefined && { twitterUrl: twitterUrl || null }),
       ...(seoKeywords !== undefined && { seoKeywords: seoKeywords || null }),
       ...(aboutAuthors !== undefined && { aboutAuthors: aboutAuthors || null }),
+      ...(authorImage !== undefined && { authorImage: authorImage || null }),
     },
     include: {
       author: { select: { id: true, name: true } },

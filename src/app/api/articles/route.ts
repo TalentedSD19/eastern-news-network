@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   const {
     title, excerpt, body: content, coverImage, images,
     subtitle, dateline, isBreaking,
-    categoryId, status, reporterName, twitterUrl, seoKeywords, aboutAuthors,
+    categoryId, status, reporterName, twitterUrl, seoKeywords, aboutAuthors, authorImage,
   } = body;
 
   if (!title || !excerpt || !content || !categoryId) {
@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
       twitterUrl: twitterUrl || null,
       seoKeywords: seoKeywords || null,
       aboutAuthors: aboutAuthors || null,
+      authorImage: authorImage || null,
       categoryId,
       authorId: session.user.id,
       status: status === "PUBLISHED" ? "PUBLISHED" : "DRAFT",

@@ -50,20 +50,50 @@ function UserIcon() {
   );
 }
 
+const SITE_URL = "https://easternnewsnetwork.com";
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await prisma.article.findUnique({
     where: { slug: params.slug, status: "PUBLISHED" },
-    select: { title: true, excerpt: true, coverImage: true, seoKeywords: true },
+    select: {
+      title: true,
+      excerpt: true,
+      coverImage: true,
+      seoKeywords: true,
+      publishedAt: true,
+      updatedAt: true,
+      author: { select: { name: true } },
+      category: { select: { name: true } },
+    },
   });
   if (!article) return {};
+
+  const url = `${SITE_URL}/article/${params.slug}`;
+  const images = article.coverImage
+    ? [{ url: article.coverImage, alt: article.title }]
+    : [];
+
   return {
     title: article.title,
     description: article.excerpt,
     keywords: article.seoKeywords ?? undefined,
+    alternates: { canonical: url },
     openGraph: {
+      type: "article",
+      url,
       title: article.title,
       description: article.excerpt,
-      ...(article.coverImage && { images: [{ url: article.coverImage }] }),
+      images,
+      publishedTime: article.publishedAt?.toISOString(),
+      modifiedTime: article.updatedAt.toISOString(),
+      authors: [article.author.name],
+      section: article.category.name,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+      images: article.coverImage ? [article.coverImage] : [],
     },
   };
 }
@@ -93,11 +123,46 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const subtitle = article.subtitle;
   const dateline = article.dateline;
   const aboutAuthors = article.aboutAuthors;
+  const authorImage = article.authorImage;
   const mins = readingTime(article.body);
   const multipleAuthors = aboutAuthors?.includes("\n\n") ?? false;
 
+  const articleUrl = `${SITE_URL}/article/${article.slug}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.excerpt,
+    url: articleUrl,
+    datePublished: (article.publishedAt ?? article.createdAt).toISOString(),
+    dateModified: article.updatedAt.toISOString(),
+    author: {
+      "@type": "Person",
+      name: byline,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Eastern News Network",
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/android-chrome-512x512.png`,
+      },
+    },
+    image: article.coverImage
+      ? { "@type": "ImageObject", url: article.coverImage }
+      : undefined,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": articleUrl,
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <SiteHeader />
       <ViewTracker articleId={article.id} />
 
@@ -194,12 +259,22 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
           {/* About the Author(s) */}
           {aboutAuthors && (
-            <div className="mt-12 rounded-sm border border-gray-200 bg-gray-50 px-6 py-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-3">
+            <div className="mt-12 mb-8 border-t-2 border-brand-red pt-8">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-6 text-center">
                 About the {multipleAuthors ? "Authors" : "Author"}
               </p>
-              <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-                {aboutAuthors}
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm flex-shrink-0">
+                  <Image
+                    src={authorImage ?? "/prasanta_profile_image.jpg"}
+                    alt={byline}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed text-justify max-w-xl">
+                  {aboutAuthors}
+                </p>
               </div>
             </div>
           )}
