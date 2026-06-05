@@ -568,7 +568,7 @@ export default function ArticleForm({ article, categories }: Props) {
                   Reset to default
                 </button>
               )}
-              <p className="text-xs text-gray-400">Shown in the "About the Author" box.</p>
+              <p className="text-xs text-gray-400">Shown in the &quot;About the Author&quot; box.</p>
             </div>
           </div>
           <input
