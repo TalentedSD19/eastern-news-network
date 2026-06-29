@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabase";
+import { r2, R2_BUCKET, R2_PUBLIC_URL } from "@/lib/supabase";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -17,7 +18,6 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
-
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
   const ext = ALLOWED_TYPES[file.type];
@@ -26,15 +26,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "File too large (max 5 MB)" }, { status: 400 });
 
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const { error } = await supabaseAdmin.storage
-    .from("article-images")
-    .upload(filename, buffer, { contentType: file.type, upsert: false });
+  await r2.send(new PutObjectCommand({
+    Bucket: R2_BUCKET,
+    Key: filename,
+    Body: buffer,
+    ContentType: file.type,
+  }));
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  const { data } = supabaseAdmin.storage.from("article-images").getPublicUrl(filename);
-  return NextResponse.json({ url: data.publicUrl });
+  return NextResponse.json({ url: `${R2_PUBLIC_URL}/${filename}` });
 }
