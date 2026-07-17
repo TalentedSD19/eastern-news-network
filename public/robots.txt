@@ -5,3 +5,4 @@ Disallow: /api/
 Disallow: /login
 
 Sitemap: https://easternnewsnetwork.com/sitemap.xml
+Sitemap: https://easternnewsnetwork.com/news-sitemap.xml
