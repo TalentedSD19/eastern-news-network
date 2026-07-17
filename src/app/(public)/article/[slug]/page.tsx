@@ -167,7 +167,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       <SiteHeader />
       <ViewTracker articleId={article.id} />
 
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-white dark:bg-neutral-950">
 
         {/* ── Article header ── */}
         <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-10 pb-2">
@@ -188,13 +188,13 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           </div>
 
           {/* Headline */}
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-[1.15] text-gray-950 mb-4">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-[1.15] text-gray-950 dark:text-gray-50 mb-4">
             {article.title}
           </h1>
 
           {/* Deck / subtitle */}
           {subtitle && (
-            <p className="font-serif text-xl text-gray-500 leading-relaxed mb-6">
+            <p className="font-serif text-xl text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
               {subtitle}
             </p>
           )}
@@ -203,32 +203,32 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <div className="w-10 h-0.5 bg-brand-red mb-5" />
 
           {/* Byline + meta */}
-          <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[13px] text-gray-500 mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[13px] text-gray-500 dark:text-gray-400 mb-8">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span>
                 <UserIcon />
                 <Link
                   href={`/author/${slugify(byline)}`}
-                  className="font-semibold text-gray-800 hover:text-brand-red transition-colors"
+                  className="font-semibold text-gray-800 dark:text-gray-200 hover:text-brand-red transition-colors"
                 >
                   By {byline}
                 </Link>
               </span>
               {dateline && (
                 <>
-                  <span className="text-gray-300 select-none">·</span>
-                  <span className="uppercase tracking-wide text-[11px] font-semibold text-gray-500">
+                  <span className="text-gray-300 dark:text-gray-600 select-none">·</span>
+                  <span className="uppercase tracking-wide text-[11px] font-semibold text-gray-500 dark:text-gray-400">
                     {dateline}
                   </span>
                 </>
               )}
             </div>
-            <div className="flex items-center gap-3 text-gray-400">
+            <div className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
               <span>
                 <CalendarIcon />
                 {formatDateTimeIST(article.publishedAt ?? article.createdAt)}
               </span>
-              <span className="text-gray-200 select-none">·</span>
+              <span className="text-gray-200 dark:text-gray-700 select-none">·</span>
               <span>
                 <ClockIcon />
                 {mins} min read
@@ -240,7 +240,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         {/* ── Cover image ── */}
         {article.coverImage && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 mb-10">
-            <figure className="relative w-full aspect-[16/9] rounded-sm overflow-hidden bg-gray-100">
+            <figure className="relative w-full aspect-[16/9] rounded-sm overflow-hidden bg-gray-100 dark:bg-white/5">
               <Image
                 src={article.coverImage}
                 alt={article.title}
@@ -258,7 +258,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <ArticleBody html={article.body} />
 
           {tweetId && (
-            <Suspense fallback={<div className="h-32 my-6 bg-gray-100 animate-pulse rounded-lg" />}>
+            <Suspense fallback={<div className="h-32 my-6 bg-gray-100 dark:bg-white/5 animate-pulse rounded-lg" />}>
               <TweetEmbed tweetId={tweetId} />
             </Suspense>
           )}
@@ -266,11 +266,11 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           {/* About the Author(s) */}
           {aboutAuthors && (
             <div className="mt-12 mb-8 border-t-2 border-brand-red pt-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-6 text-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-6 text-center">
                 About the {multipleAuthors ? "Authors" : "Author"}
               </p>
               <div className="flex flex-col items-center gap-4">
-                <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm flex-shrink-0">
+                <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 shadow-sm flex-shrink-0">
                   <Image
                     src={authorImage ?? "/prasanta_profile_image.jpg"}
                     alt={byline}
@@ -278,7 +278,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                     className="object-cover"
                   />
                 </div>
-                <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed text-justify max-w-xl">
+                <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed text-justify max-w-xl">
                   {aboutAuthors}
                 </p>
               </div>

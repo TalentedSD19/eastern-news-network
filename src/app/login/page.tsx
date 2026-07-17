@@ -36,12 +36,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
-      <div className="bg-white border border-gray-200 shadow-sm p-8 w-full max-w-sm">
+    <div className="min-h-screen bg-stone-50 dark:bg-neutral-950 flex items-center justify-center px-4">
+      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10 shadow-sm p-8 w-full max-w-sm">
         <div className="flex flex-col items-center gap-1 mb-6">
           <Image src="/android-chrome-192x192.png" alt="Eastern News Network" width={72} height={72} className="mb-2" />
-          <span className="font-serif font-bold text-2xl text-gray-900 tracking-tight">Eastern News Network</span>
-          <span className="text-[0.6rem] tracking-[0.2em] text-gray-400 uppercase font-sans">Admin Access</span>
+          <span className="font-serif font-bold text-2xl text-gray-900 dark:text-gray-50 tracking-tight">Eastern News Network</span>
+          <span className="text-[0.6rem] tracking-[0.2em] text-gray-400 dark:text-gray-500 uppercase font-sans">Admin Access</span>
           <div className="w-6 h-0.5 bg-brand-red mt-3" />
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">

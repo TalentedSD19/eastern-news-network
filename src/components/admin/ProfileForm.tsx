@@ -85,13 +85,13 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
     <form onSubmit={handleSave} className="max-w-lg space-y-8">
       {/* Avatar */}
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Profile Picture</h2>
+        <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Profile Picture</h2>
         <div className="flex items-center gap-5">
-          <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-200 shrink-0 border border-gray-300">
+          <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-white/10 shrink-0 border border-gray-300 dark:border-white/10">
             {avatarUrl ? (
               <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-gray-400 select-none">
+              <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-gray-400 dark:text-gray-500 select-none">
                 {name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -111,13 +111,13 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-red-500 hover:text-red-600"
+                className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
                 onClick={() => setAvatarUrl(null)}
               >
                 Remove
               </Button>
             )}
-            <p className="text-xs text-gray-400">JPG, PNG or WebP — max 5 MB</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">JPG, PNG or WebP — max 5 MB</p>
           </div>
         </div>
         <input
@@ -131,22 +131,22 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
 
       {/* Name + Email */}
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Account Details</h2>
+        <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Account Details</h2>
         <div className="space-y-1">
           <Label htmlFor="name">Display Name</Label>
           <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <div className="space-y-1">
           <Label>Email</Label>
-          <Input value={initial.email} disabled className="bg-gray-100 text-gray-500 cursor-not-allowed" />
-          <p className="text-xs text-gray-400">Email cannot be changed.</p>
+          <Input value={initial.email} disabled className="bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
+          <p className="text-xs text-gray-400 dark:text-gray-500">Email cannot be changed.</p>
         </div>
       </section>
 
       {/* Password */}
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Change Password</h2>
-        <p className="text-xs text-gray-400">Leave blank to keep your current password.</p>
+        <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Change Password</h2>
+        <p className="text-xs text-gray-400 dark:text-gray-500">Leave blank to keep your current password.</p>
         <div className="space-y-1">
           <Label htmlFor="currentPassword">Current Password</Label>
           <Input
@@ -181,7 +181,7 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
       </section>
 
       {message && (
-        <p className={`text-sm ${message.type === "success" ? "text-green-600" : "text-red-500"}`}>
+        <p className={`text-sm ${message.type === "success" ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
           {message.text}
         </p>
       )}

@@ -71,15 +71,15 @@ export default function VoteBar({ articleId, initialUp, initialDown }: Props) {
   const downPct = total > 0 ? 100 - upPct : 50;
 
   return (
-    <section className="my-12 border-t border-b border-gray-200 py-10">
+    <section className="my-12 border-t border-b border-gray-200 dark:border-white/10 py-10">
       <div className="text-center mb-8">
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
           Reader Verdict
         </p>
-        <h3 className="font-serif text-2xl font-bold text-gray-900">
+        <h3 className="font-serif text-2xl font-bold text-gray-900 dark:text-gray-50">
           How do you rate this report?
         </h3>
-        <p className="text-sm text-gray-500 mt-2 max-w-xs mx-auto">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-xs mx-auto">
           Your vote helps us understand what journalism matters to our readers.
         </p>
       </div>
@@ -92,30 +92,30 @@ export default function VoteBar({ articleId, initialUp, initialDown }: Props) {
           aria-pressed={userVote === "UP"}
           className={`group flex-1 flex flex-col items-center gap-3 rounded-lg border-2 px-4 py-6 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
             userVote === "UP"
-              ? "border-emerald-500 bg-emerald-50 text-emerald-700 focus-visible:ring-emerald-500"
-              : "border-gray-200 bg-white text-gray-600 hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:ring-emerald-400"
+              ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 focus-visible:ring-emerald-500"
+              : "border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-400 focus-visible:ring-emerald-400"
           } disabled:cursor-not-allowed`}
         >
           <ThumbUpIcon
             className={`w-8 h-8 transition-colors ${
-              userVote === "UP" ? "stroke-emerald-600" : "stroke-gray-400 group-hover:stroke-emerald-500"
+              userVote === "UP" ? "stroke-emerald-600 dark:stroke-emerald-400" : "stroke-gray-400 group-hover:stroke-emerald-500"
             }`}
           />
           <div className="text-center">
-            <p className={`text-sm font-bold ${userVote === "UP" ? "text-emerald-700" : "text-gray-800"}`}>
+            <p className={`text-sm font-bold ${userVote === "UP" ? "text-emerald-700 dark:text-emerald-400" : "text-gray-800 dark:text-gray-200"}`}>
               Credible Report
             </p>
-            <p className="text-xs text-gray-400 mt-0.5 leading-snug">Accurate &amp; well-sourced</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-snug">Accurate &amp; well-sourced</p>
           </div>
           <span
             className={`text-2xl font-black tabular-nums ${
-              userVote === "UP" ? "text-emerald-600" : "text-gray-500"
+              userVote === "UP" ? "text-emerald-600 dark:text-emerald-400" : "text-gray-500 dark:text-gray-400"
             }`}
           >
             {counts.up}
           </span>
           {userVote === "UP" && (
-            <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-600">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-600 dark:text-emerald-400">
               Your vote
             </span>
           )}
@@ -128,30 +128,30 @@ export default function VoteBar({ articleId, initialUp, initialDown }: Props) {
           aria-pressed={userVote === "DOWN"}
           className={`group flex-1 flex flex-col items-center gap-3 rounded-lg border-2 px-4 py-6 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
             userVote === "DOWN"
-              ? "border-rose-500 bg-rose-50 text-rose-700 focus-visible:ring-rose-500"
-              : "border-gray-200 bg-white text-gray-600 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700 focus-visible:ring-rose-400"
+              ? "border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 focus-visible:ring-rose-500"
+              : "border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:border-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-400 focus-visible:ring-rose-400"
           } disabled:cursor-not-allowed`}
         >
           <ThumbDownIcon
             className={`w-8 h-8 transition-colors ${
-              userVote === "DOWN" ? "stroke-rose-600" : "stroke-gray-400 group-hover:stroke-rose-500"
+              userVote === "DOWN" ? "stroke-rose-600 dark:stroke-rose-400" : "stroke-gray-400 group-hover:stroke-rose-500"
             }`}
           />
           <div className="text-center">
-            <p className={`text-sm font-bold ${userVote === "DOWN" ? "text-rose-700" : "text-gray-800"}`}>
+            <p className={`text-sm font-bold ${userVote === "DOWN" ? "text-rose-700 dark:text-rose-400" : "text-gray-800 dark:text-gray-200"}`}>
               Needs Scrutiny
             </p>
-            <p className="text-xs text-gray-400 mt-0.5 leading-snug">Questionable or inaccurate</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-snug">Questionable or inaccurate</p>
           </div>
           <span
             className={`text-2xl font-black tabular-nums ${
-              userVote === "DOWN" ? "text-rose-600" : "text-gray-500"
+              userVote === "DOWN" ? "text-rose-600 dark:text-rose-400" : "text-gray-500 dark:text-gray-400"
             }`}
           >
             {counts.down}
           </span>
           {userVote === "DOWN" && (
-            <span className="text-[10px] uppercase tracking-widest font-bold text-rose-600">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-rose-600 dark:text-rose-400">
               Your vote
             </span>
           )}
@@ -161,7 +161,7 @@ export default function VoteBar({ articleId, initialUp, initialDown }: Props) {
       {/* Credibility bar */}
       {total > 0 && (
         <div className="mt-8 max-w-sm mx-auto">
-          <div className="flex rounded-full overflow-hidden h-1.5 bg-gray-100">
+          <div className="flex rounded-full overflow-hidden h-1.5 bg-gray-100 dark:bg-white/10">
             <div
               className="h-full bg-emerald-400 transition-all duration-500"
               style={{ width: `${upPct}%` }}
@@ -171,7 +171,7 @@ export default function VoteBar({ articleId, initialUp, initialDown }: Props) {
               style={{ width: `${downPct}%` }}
             />
           </div>
-          <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[11px] text-gray-400 mt-2">
+          <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[11px] text-gray-400 dark:text-gray-500 mt-2">
             <span>{upPct}% found this credible</span>
             <span>{total} {total === 1 ? "reader" : "readers"} voted</span>
             <span>{downPct}% flagged it</span>

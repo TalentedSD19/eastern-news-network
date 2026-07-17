@@ -3,7 +3,7 @@ import ArticleCard from "./ArticleCard";
 
 export default function ArticleGrid({ articles }: { articles: ArticleWithRelations[] }) {
   if (articles.length === 0) {
-    return <p className="text-center text-gray-500 py-20">No articles yet.</p>;
+    return <p className="text-center text-gray-500 dark:text-gray-400 py-20">No articles yet.</p>;
   }
 
   return (

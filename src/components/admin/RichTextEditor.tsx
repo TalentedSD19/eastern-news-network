@@ -41,7 +41,7 @@ function ToolbarButton({
       className={`p-1.5 rounded transition-colors ${
         active
           ? "bg-brand-red text-white"
-          : "text-gray-600 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+          : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
       }`}
     >
       {children}
@@ -50,7 +50,7 @@ function ToolbarButton({
 }
 
 function Divider() {
-  return <span className="w-px h-5 bg-gray-300 mx-1 self-center" />;
+  return <span className="w-px h-5 bg-gray-300 dark:bg-white/15 mx-1 self-center" />;
 }
 
 export default function RichTextEditor({ value, onChange, editorRef }: Props) {
@@ -68,7 +68,7 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm max-w-none min-h-[480px] p-5 focus:outline-none",
+        class: "prose prose-sm dark:prose-invert max-w-none min-h-[480px] p-5 focus:outline-none",
       },
     },
   });
@@ -103,9 +103,9 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden shadow-sm">
+    <div className="border dark:border-white/10 rounded-lg overflow-hidden shadow-sm">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 px-2 py-2 border-b bg-gray-50">
+      <div className="flex flex-wrap items-center gap-0.5 px-2 py-2 border-b dark:border-white/10 bg-gray-50 dark:bg-white/5">
         {/* History */}
         <ToolbarButton
           title="Undo"
@@ -234,7 +234,7 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
       </div>
 
       {/* Editor area */}
-      <EditorContent editor={editor} className="bg-white" />
+      <EditorContent editor={editor} className="bg-white dark:bg-neutral-900" />
     </div>
   );
 }

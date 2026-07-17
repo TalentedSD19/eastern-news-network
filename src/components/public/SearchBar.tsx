@@ -72,7 +72,7 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
   return (
     <div ref={containerRef} className="relative">
       <div
-        className={`flex items-center bg-gray-100 border border-gray-200 rounded-full px-3 py-1.5 gap-2 focus-within:bg-white focus-within:border-gray-400 focus-within:shadow-sm transition-all ${
+        className={`flex items-center bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-full px-3 py-1.5 gap-2 focus-within:bg-white dark:focus-within:bg-white/5 focus-within:border-gray-400 dark:focus-within:border-gray-500 focus-within:shadow-sm transition-all ${
           wide ? "w-full" : "w-48"
         }`}
       >
@@ -85,14 +85,14 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
           onFocus={() => { if (results.length > 0) setOpen(true); }}
           placeholder="Search articles…"
-          className="bg-transparent text-gray-900 text-sm placeholder-gray-400 outline-none w-full min-w-0"
+          className="bg-transparent text-gray-900 dark:text-gray-100 text-sm placeholder-gray-400 outline-none w-full min-w-0"
         />
         {query && (
           <button
             type="button"
             onPointerDown={(e) => e.preventDefault()}
             onClick={clear}
-            className="text-gray-400 hover:text-gray-700 transition-colors shrink-0"
+            className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors shrink-0"
           >
             <X size={13} />
           </button>
@@ -101,14 +101,14 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
 
       {open && (
         <div
-          className={`absolute top-full mt-2 bg-white rounded-lg shadow-xl ring-1 ring-black/10 z-50 overflow-hidden ${
+          className={`absolute top-full mt-2 bg-white dark:bg-neutral-900 rounded-lg shadow-xl ring-1 ring-black/10 dark:ring-white/10 z-50 overflow-hidden ${
             wide ? "left-0 right-0" : "right-0 w-80"
           }`}
         >
           {loading ? (
-            <p className="px-4 py-3 text-sm text-gray-500">Searching…</p>
+            <p className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Searching…</p>
           ) : results.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-gray-500">
+            <p className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
               No articles found for &ldquo;{query.trim()}&rdquo;.
             </p>
           ) : (
@@ -118,7 +118,7 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
                   <Link
                     href={`/article/${article.slug}`}
                     onClick={() => { setQuery(""); setResults([]); setOpen(false); }}
-                    className="flex gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                    className="flex gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-gray-100 dark:border-white/10 last:border-0"
                   >
                     {article.coverImage ? (
                       <Image
@@ -129,16 +129,16 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
                         className="rounded object-cover shrink-0 self-start mt-0.5"
                       />
                     ) : (
-                      <div className="w-14 h-10 rounded bg-gray-100 shrink-0 self-start mt-0.5" />
+                      <div className="w-14 h-10 rounded bg-gray-100 dark:bg-white/10 shrink-0 self-start mt-0.5" />
                     )}
                     <div className="min-w-0">
                       <p className="text-[0.7rem] font-semibold text-brand-red mb-0.5 uppercase tracking-wide">
                         {article.category.name}
                       </p>
-                      <p className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug line-clamp-2">
                         {article.title}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{article.excerpt}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">{article.excerpt}</p>
                     </div>
                   </Link>
                 </li>

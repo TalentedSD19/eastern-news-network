@@ -87,8 +87,8 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-stone-50 text-gray-900 flex flex-col min-h-screen`}>
+    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
+      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-stone-50 text-gray-900 dark:bg-neutral-950 dark:text-gray-100 flex flex-col min-h-screen overflow-x-hidden w-full`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

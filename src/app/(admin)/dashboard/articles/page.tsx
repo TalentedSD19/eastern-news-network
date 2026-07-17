@@ -30,7 +30,7 @@ export default async function ArticlesListPage() {
           New Article
         </Link>
       </div>
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -53,8 +53,8 @@ export default async function ArticlesListPage() {
                     {a.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-gray-500">{a._count.views}</TableCell>
-                <TableCell className="text-gray-500">{a._count.comments}</TableCell>
+                <TableCell className="text-gray-500 dark:text-gray-400">{a._count.views}</TableCell>
+                <TableCell className="text-gray-500 dark:text-gray-400">{a._count.comments}</TableCell>
                 <TableCell>{formatDate(a.createdAt)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
@@ -78,7 +78,7 @@ export default async function ArticlesListPage() {
             ))}
             {articles.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-gray-400 py-10">
+                <TableCell colSpan={7} className="text-center text-gray-400 dark:text-gray-500 py-10">
                   No articles yet.
                 </TableCell>
               </TableRow>

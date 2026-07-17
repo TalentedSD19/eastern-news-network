@@ -125,7 +125,7 @@ export default function ShareBar({ title }: Props) {
       label: "X",
       href: `https://twitter.com/intent/tweet?url=${enc(pageUrl)}&text=${enc(title)}`,
       icon: <XIcon />,
-      hover: "hover:text-gray-950 hover:border-gray-950",
+      hover: "hover:text-gray-950 dark:hover:text-gray-100 hover:border-gray-950 dark:hover:border-gray-300",
     },
     {
       label: "LinkedIn",
@@ -143,11 +143,11 @@ export default function ShareBar({ title }: Props) {
   ];
 
   const base =
-    "inline-flex items-center gap-1.5 border border-gray-200 rounded-sm px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-gray-500 transition-colors duration-150";
+    "inline-flex items-center gap-1.5 border border-gray-200 dark:border-white/15 rounded-sm px-3 py-2 sm:py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-gray-400 transition-colors duration-150";
 
   return (
-    <section className="border-t border-gray-200 pt-8 mb-2">
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-4">
+    <section className="border-t border-gray-200 dark:border-white/10 pt-8 mb-2">
+      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-4">
         Share this story
       </p>
       <div className="flex flex-wrap gap-2">
@@ -178,8 +178,8 @@ export default function ShareBar({ title }: Props) {
           onClick={copyLink}
           className={`${base} ${
             copied
-              ? "border-emerald-400 text-emerald-600"
-              : "hover:text-gray-950 hover:border-gray-400"
+              ? "border-emerald-400 text-emerald-600 dark:text-emerald-400"
+              : "hover:text-gray-950 dark:hover:text-gray-100 hover:border-gray-400"
           }`}
         >
           {copied ? <CheckIcon /> : <LinkIcon />}

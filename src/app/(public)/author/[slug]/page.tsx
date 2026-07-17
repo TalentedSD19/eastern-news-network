@@ -107,21 +107,21 @@ export default async function AuthorPage({
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex items-center gap-5 mb-8">
             {image && (
-              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 shrink-0">
+              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 shrink-0">
                 <Image src={image} alt={byline} fill className="object-cover" />
               </div>
             )}
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
                 Author
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-950">{byline}</h1>
+              <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-950 dark:text-gray-50">{byline}</h1>
               <div className="w-8 h-0.5 bg-brand-red mt-3" />
             </div>
           </div>
 
           {bio && (
-            <p className="text-sm text-gray-600 leading-relaxed max-w-2xl mb-10 whitespace-pre-line">
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mb-10 whitespace-pre-line">
               {bio}
             </p>
           )}
