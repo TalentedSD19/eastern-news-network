@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 interface Props {
   title: string;
   articleId: string;
+  compact?: boolean;
 }
 
 /* ── Icons ─────────────────────────────────────────────────────── */
@@ -77,7 +78,7 @@ function CheckIcon() {
 
 /* ── Component ──────────────────────────────────────────────────── */
 
-export default function ShareBar({ title, articleId }: Props) {
+export default function ShareBar({ title, articleId, compact = false }: Props) {
   const [pageUrl, setPageUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -156,6 +157,52 @@ export default function ShareBar({ title, articleId }: Props) {
 
   const base =
     "inline-flex items-center gap-1.5 border border-gray-200 dark:border-white/15 rounded-sm px-3 py-2 sm:py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-gray-400 transition-colors duration-150";
+
+  if (compact) {
+    const iconBase =
+      "inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-200 dark:border-white/15 text-gray-500 dark:text-gray-400 transition-colors duration-150";
+
+    return (
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {shareLinks.map((btn) => (
+          <a
+            key={btn.label}
+            href={btn.href}
+            target={btn.sameTab ? "_self" : "_blank"}
+            rel="noopener noreferrer"
+            title={btn.label}
+            aria-label={`Share on ${btn.label}`}
+            onClick={() => trackShare(btn.label)}
+            className={`${iconBase} ${btn.hover}`}
+          >
+            {btn.icon}
+          </a>
+        ))}
+
+        <button
+          onClick={shareInstagram}
+          title="Instagram"
+          aria-label="Share on Instagram"
+          className={`${iconBase} hover:text-[#E1306C] hover:border-[#E1306C]`}
+        >
+          <InstagramIcon />
+        </button>
+
+        <button
+          onClick={copyLink}
+          title={copied ? "Copied!" : "Copy link"}
+          aria-label="Copy link"
+          className={`${iconBase} ${
+            copied
+              ? "border-emerald-400 text-emerald-600 dark:text-emerald-400"
+              : "hover:text-gray-950 dark:hover:text-gray-100 hover:border-gray-400"
+          }`}
+        >
+          {copied ? <CheckIcon /> : <LinkIcon />}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <section className="border-t border-gray-200 dark:border-white/10 pt-8 mb-2">

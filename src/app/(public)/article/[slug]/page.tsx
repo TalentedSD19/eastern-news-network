@@ -12,8 +12,10 @@ import VoteBar from "@/components/public/VoteBar";
 import ShareBar from "@/components/public/ShareBar";
 import CommentSection from "@/components/public/CommentSection";
 import TweetEmbed from "@/components/public/TweetEmbed";
+import ArticleGrid from "@/components/public/ArticleGrid";
 import { formatDateTimeIST, slugify } from "@/lib/utils";
 import { extractTweetId } from "@/lib/extractTweetId";
+import type { ArticleWithRelations } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -116,6 +118,53 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   });
   const initialUp = voteRows.find((r) => r.voteType === "UP")?._count.id ?? 0;
   const initialDown = voteRows.find((r) => r.voteType === "DOWN")?._count.id ?? 0;
+
+  const SIMILAR_LIMIT = 3;
+  const similarArticles = await prisma.article.findMany({
+    where: {
+      status: "PUBLISHED",
+      categoryId: article.categoryId,
+      id: { not: article.id },
+    },
+    include: {
+      author: { select: { id: true, name: true } },
+      category: { select: { id: true, name: true, slug: true } },
+    },
+    orderBy: { publishedAt: "desc" },
+    take: SIMILAR_LIMIT,
+  });
+
+  if (similarArticles.length < SIMILAR_LIMIT) {
+    const keywords = Array.from(
+      new Set(
+        article.title
+          .split(/\W+/)
+          .map((w) => w.trim())
+          .filter((w) => w.length > 3)
+      )
+    ).slice(0, 6);
+
+    if (keywords.length > 0) {
+      const excludeIds = [article.id, ...similarArticles.map((a) => a.id)];
+      const keywordMatches = await prisma.article.findMany({
+        where: {
+          status: "PUBLISHED",
+          id: { notIn: excludeIds },
+          OR: keywords.flatMap((word) => [
+            { title: { contains: word, mode: "insensitive" as const } },
+            { seoKeywords: { contains: word, mode: "insensitive" as const } },
+          ]),
+        },
+        include: {
+          author: { select: { id: true, name: true } },
+          category: { select: { id: true, name: true, slug: true } },
+        },
+        orderBy: { publishedAt: "desc" },
+        take: SIMILAR_LIMIT - similarArticles.length,
+      });
+      similarArticles.push(...keywordMatches);
+    }
+  }
 
   const tweetId = article.twitterUrl ? extractTweetId(article.twitterUrl) : null;
   const byline = article.reporterName ?? article.author.name;
@@ -235,6 +284,13 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </span>
             </div>
           </div>
+
+          {/* Vote & Share */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 py-4 mb-2 border-y border-gray-200 dark:border-white/10">
+            <VoteBar articleId={article.id} initialUp={initialUp} initialDown={initialDown} compact />
+            <div className="hidden sm:block w-px h-6 bg-gray-200 dark:bg-white/10" />
+            <ShareBar title={article.title} articleId={article.id} compact />
+          </div>
         </div>
 
         {/* ── Cover image ── */}
@@ -285,15 +341,24 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             </div>
           )}
 
-          {/* ── Share ── */}
-          <ShareBar title={article.title} articleId={article.id} />
-
-          {/* ── Vote section — prominently at bottom ── */}
-          <VoteBar articleId={article.id} initialUp={initialUp} initialDown={initialDown} />
-
           {/* ── Comments ── */}
           <CommentSection articleId={article.id} />
         </div>
+
+        {/* ── Similar stories ── */}
+        {similarArticles.length > 0 && (
+          <div className="border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.02]">
+            <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-14">
+              <div className="flex items-center gap-3 mb-8">
+                <h2 className="font-serif text-2xl font-bold text-gray-900 dark:text-gray-50 whitespace-nowrap">
+                  Similar Stories
+                </h2>
+                <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
+              </div>
+              <ArticleGrid articles={similarArticles as ArticleWithRelations[]} />
+            </div>
+          </div>
+        )}
       </main>
 
       <SiteFooter />

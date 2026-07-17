@@ -6,6 +6,7 @@ interface Props {
   articleId: string;
   initialUp: number;
   initialDown: number;
+  compact?: boolean;
 }
 
 function getOrCreateToken(): string {
@@ -36,7 +37,7 @@ function ThumbDownIcon({ className }: { className?: string }) {
   );
 }
 
-export default function VoteBar({ articleId, initialUp, initialDown }: Props) {
+export default function VoteBar({ articleId, initialUp, initialDown, compact = false }: Props) {
   const [counts, setCounts] = useState({ up: initialUp, down: initialDown });
   const [userVote, setUserVote] = useState<"UP" | "DOWN" | null>(null);
   const [loading, setLoading] = useState(false);
@@ -69,6 +70,41 @@ export default function VoteBar({ articleId, initialUp, initialDown }: Props) {
   const total = counts.up + counts.down;
   const upPct = total > 0 ? Math.round((counts.up / total) * 100) : 50;
   const downPct = total > 0 ? 100 - upPct : 50;
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        <button
+          onClick={() => vote("UP")}
+          disabled={loading}
+          aria-pressed={userVote === "UP"}
+          title="Credible Report"
+          className={`inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-bold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed ${
+            userVote === "UP"
+              ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 focus-visible:ring-emerald-500"
+              : "border-gray-200 dark:border-white/15 text-gray-600 dark:text-gray-300 hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-400 focus-visible:ring-emerald-400"
+          }`}
+        >
+          <ThumbUpIcon className="w-4 h-4" />
+          <span className="tabular-nums">{counts.up}</span>
+        </button>
+        <button
+          onClick={() => vote("DOWN")}
+          disabled={loading}
+          aria-pressed={userVote === "DOWN"}
+          title="Needs Scrutiny"
+          className={`inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-xs font-bold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed ${
+            userVote === "DOWN"
+              ? "border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 focus-visible:ring-rose-500"
+              : "border-gray-200 dark:border-white/15 text-gray-600 dark:text-gray-300 hover:border-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-400 focus-visible:ring-rose-400"
+          }`}
+        >
+          <ThumbDownIcon className="w-4 h-4" />
+          <span className="tabular-nums">{counts.down}</span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <section className="my-12 border-t border-b border-gray-200 dark:border-white/10 py-10">
