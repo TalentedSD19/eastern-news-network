@@ -12,7 +12,7 @@ import VoteBar from "@/components/public/VoteBar";
 import ShareBar from "@/components/public/ShareBar";
 import CommentSection from "@/components/public/CommentSection";
 import TweetEmbed from "@/components/public/TweetEmbed";
-import { formatDateTimeIST } from "@/lib/utils";
+import { formatDateTimeIST, slugify } from "@/lib/utils";
 import { extractTweetId } from "@/lib/extractTweetId";
 
 export const dynamic = "force-dynamic";
@@ -139,6 +139,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     author: {
       "@type": "Person",
       name: byline,
+      url: `${SITE_URL}/author/${slugify(byline)}`,
     },
     publisher: {
       "@type": "Organization",
@@ -206,7 +207,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             <div className="flex items-center gap-1.5 flex-wrap">
               <span>
                 <UserIcon />
-                <span className="font-semibold text-gray-800">By {byline}</span>
+                <Link
+                  href={`/author/${slugify(byline)}`}
+                  className="font-semibold text-gray-800 hover:text-brand-red transition-colors"
+                >
+                  By {byline}
+                </Link>
               </span>
               {dateline && (
                 <>

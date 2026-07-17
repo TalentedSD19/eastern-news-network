@@ -68,10 +68,31 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsMediaOrganization",
+  name: "Eastern News Network",
+  url: "https://easternnewsnetwork.com",
+  logo: {
+    "@type": "ImageObject",
+    url: "https://easternnewsnetwork.com/android-chrome-512x512.png",
+  },
+  description:
+    "Independent news from the East — politics, economy, society, and culture.",
+  foundingLocation: "India",
+  sameAs: ["https://twitter.com/EasternNewsNet"],
+  ethicsPolicy: "https://easternnewsnetwork.com/editorial-policy",
+  correctionsPolicy: "https://easternnewsnetwork.com/editorial-policy",
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-stone-50 text-gray-900 flex flex-col min-h-screen`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <Providers>
           <NavigationProgress />
           {children}
