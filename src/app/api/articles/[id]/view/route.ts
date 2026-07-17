@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { classifyDevice } from "@/lib/device";
+
+const VISITOR_COOKIE = "enn_vid";
+
+function getReferrerHost(referer: string | null): string | null {
+  if (!referer) return null;
+  try {
+    return new URL(referer).hostname || null;
+  } catch {
+    return null;
+  }
+}
 
 async function getGeoFromIp(ip: string) {
   try {
@@ -40,9 +53,26 @@ export async function POST(
     if (ip !== "127.0.0.1") geo = await getGeoFromIp(ip);
   }
 
-  await prisma.articleView.create({
-    data: { articleId: params.id, ...geo },
+  const referrerHost = getReferrerHost(request.headers.get("referer"));
+  const userAgent = request.headers.get("user-agent");
+  const deviceType = userAgent ? classifyDevice(userAgent) : null;
+
+  const existingVisitorId = request.cookies.get(VISITOR_COOKIE)?.value;
+  const visitorId = existingVisitorId ?? randomUUID();
+
+  const view = await prisma.articleView.create({
+    data: { articleId: params.id, ...geo, referrerHost, userAgent, deviceType, visitorId },
+    select: { id: true },
   });
 
-  return NextResponse.json({ ok: true });
+  const response = NextResponse.json({ ok: true, viewId: view.id });
+  if (!existingVisitorId) {
+    response.cookies.set(VISITOR_COOKIE, visitorId, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+      path: "/",
+    });
+  }
+  return response;
 }

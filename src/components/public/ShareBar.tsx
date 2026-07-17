@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 interface Props {
   title: string;
+  articleId: string;
 }
 
 /* ── Icons ─────────────────────────────────────────────────────── */
@@ -76,7 +77,7 @@ function CheckIcon() {
 
 /* ── Component ──────────────────────────────────────────────────── */
 
-export default function ShareBar({ title }: Props) {
+export default function ShareBar({ title, articleId }: Props) {
   const [pageUrl, setPageUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -84,7 +85,17 @@ export default function ShareBar({ title }: Props) {
     setPageUrl(window.location.href);
   }, []);
 
+  function trackShare(platform: string) {
+    try {
+      const blob = new Blob([JSON.stringify({ platform })], { type: "application/json" });
+      navigator.sendBeacon(`/api/articles/${articleId}/share`, blob);
+    } catch {
+      // tracking should never block the actual share
+    }
+  }
+
   async function copyLink() {
+    trackShare("Copy link");
     try {
       await navigator.clipboard.writeText(pageUrl);
       setCopied(true);
@@ -95,6 +106,7 @@ export default function ShareBar({ title }: Props) {
   }
 
   async function shareInstagram() {
+    trackShare("Instagram");
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({ title, url: pageUrl });
@@ -157,6 +169,7 @@ export default function ShareBar({ title }: Props) {
             href={btn.href}
             target={btn.sameTab ? "_self" : "_blank"}
             rel="noopener noreferrer"
+            onClick={() => trackShare(btn.label)}
             className={`${base} ${btn.hover}`}
           >
             {btn.icon}
