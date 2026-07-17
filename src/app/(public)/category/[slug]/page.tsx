@@ -69,10 +69,10 @@ export default async function CategoryPage({
       <main className="flex-1 w-full">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
           <div className="mb-8">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 mb-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
               Category
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-950">
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-950 dark:text-gray-50">
               {category.name}
             </h1>
             <div className="w-8 h-0.5 bg-brand-red mt-3" />

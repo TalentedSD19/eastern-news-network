@@ -174,14 +174,14 @@ export default function ArticleForm({ article, categories }: Props) {
     <div className="max-w-3xl">
 
       {/* ── Tab bar ── */}
-      <div className="flex items-center gap-1 mb-6 border-b">
+      <div className="flex items-center gap-1 mb-6 border-b dark:border-white/10">
         <button
           type="button"
           onClick={() => setMode("edit")}
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             mode === "edit"
               ? "border-brand-red text-brand-red"
-              : "border-transparent text-gray-500 hover:text-gray-800"
+              : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           }`}
         >
           Edit
@@ -192,7 +192,7 @@ export default function ArticleForm({ article, categories }: Props) {
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             mode === "preview"
               ? "border-brand-red text-brand-red"
-              : "border-transparent text-gray-500 hover:text-gray-800"
+              : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           }`}
         >
           Preview
@@ -200,7 +200,7 @@ export default function ArticleForm({ article, categories }: Props) {
 
         {/* Auto-save indicator */}
         {article && (
-          <span className="ml-auto pb-2 text-xs text-gray-400">
+          <span className="ml-auto pb-2 text-xs text-gray-400 dark:text-gray-500">
             {saveStatus === "saving" && "Saving…"}
             {saveStatus === "unsaved" && "Unsaved changes"}
             {saveStatus === "saved" && lastSaved && savedAtLabel(lastSaved)}
@@ -214,7 +214,7 @@ export default function ArticleForm({ article, categories }: Props) {
       {/* ══════════════════ PREVIEW ══════════════════ */}
       {mode === "preview" && (
         <div>
-          <p className="text-xs text-gray-400 bg-gray-50 border rounded px-3 py-1.5 mb-6 inline-block">
+          <p className="text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/5 border dark:border-white/10 rounded px-3 py-1.5 mb-6 inline-block">
             Preview — not yet published
           </p>
 
@@ -231,16 +231,16 @@ export default function ArticleForm({ article, categories }: Props) {
             </div>
 
             <h1 className="font-serif text-4xl font-bold leading-tight mb-2">
-              {title || <span className="text-gray-300">Article title will appear here</span>}
+              {title || <span className="text-gray-300 dark:text-gray-600">Article title will appear here</span>}
             </h1>
 
             {subtitle && (
-              <p className="font-serif text-xl text-gray-500 mb-4 leading-snug">{subtitle}</p>
+              <p className="font-serif text-xl text-gray-500 dark:text-gray-400 mb-4 leading-snug">{subtitle}</p>
             )}
 
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
               {dateline && (
-                <span className="font-semibold text-gray-700 uppercase tracking-wide">
+                <span className="font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
                   {dateline} —{" "}
                 </span>
               )}
@@ -248,7 +248,7 @@ export default function ArticleForm({ article, categories }: Props) {
             </p>
 
             {images[0] && (
-              <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-2 bg-gray-100">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-2 bg-gray-100 dark:bg-white/5">
                 <Image
                   src={images[0].url}
                   alt={images[0].caption || title}
@@ -258,19 +258,19 @@ export default function ArticleForm({ article, categories }: Props) {
               </div>
             )}
             {images[0]?.caption && (
-              <p className="text-center text-xs text-gray-500 mb-8 italic">{images[0].caption}</p>
+              <p className="text-center text-xs text-gray-500 dark:text-gray-400 mb-8 italic">{images[0].caption}</p>
             )}
 
             {body ? (
               <ArticleBody html={body} />
             ) : (
-              <p className="text-gray-300 italic">Article body will appear here…</p>
+              <p className="text-gray-300 dark:text-gray-600 italic">Article body will appear here…</p>
             )}
 
             {aboutAuthors && (
-              <div className="mt-10 border-t pt-6">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">About the Author{aboutAuthors.includes("\n\n") ? "s" : ""}</h3>
-                <div className="text-sm text-gray-600 whitespace-pre-line">{aboutAuthors}</div>
+              <div className="mt-10 border-t dark:border-white/10 pt-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">About the Author{aboutAuthors.includes("\n\n") ? "s" : ""}</h3>
+                <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">{aboutAuthors}</div>
               </div>
             )}
           </article>
@@ -299,7 +299,7 @@ export default function ArticleForm({ article, categories }: Props) {
         {/* Subtitle / Deck */}
         <div className="space-y-1">
           <Label htmlFor="subtitle">
-            Subtitle <span className="text-gray-400 font-normal">(optional)</span>
+            Subtitle <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
           </Label>
           <Input
             id="subtitle"
@@ -328,7 +328,7 @@ export default function ArticleForm({ article, categories }: Props) {
           </div>
           <div className="space-y-1">
             <Label htmlFor="dateline">
-              Dateline <span className="text-gray-400 font-normal">(optional)</span>
+              Dateline <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
             </Label>
             <Input
               id="dateline"
@@ -368,7 +368,7 @@ export default function ArticleForm({ article, categories }: Props) {
                 if (!existing.includes(kw)) setSeoKeywords([...existing, kw].join(","));
                 setKeywordInput("");
               }}
-              className="shrink-0 px-3 py-1 text-sm rounded-md border border-input bg-transparent hover:bg-gray-50"
+              className="shrink-0 px-3 py-1 text-sm rounded-md border border-input bg-transparent hover:bg-gray-50 dark:hover:bg-white/5"
             >
               Add
             </button>
@@ -382,7 +382,7 @@ export default function ArticleForm({ article, categories }: Props) {
                 .map((kw) => (
                   <span
                     key={kw}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-xs text-gray-700"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-xs text-gray-700 dark:text-gray-300"
                   >
                     {kw}
                     <button
@@ -396,7 +396,7 @@ export default function ArticleForm({ article, categories }: Props) {
                             .join(","),
                         )
                       }
-                      className="text-gray-400 hover:text-gray-700 leading-none"
+                      className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 leading-none"
                     >
                       ×
                     </button>
@@ -404,7 +404,7 @@ export default function ArticleForm({ article, categories }: Props) {
                 ))}
             </div>
           )}
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             Keywords help search engines understand what this article is about.
           </p>
         </div>
@@ -419,7 +419,7 @@ export default function ArticleForm({ article, categories }: Props) {
                   ? "text-red-500 font-semibold"
                   : excerptLen > EXCERPT_LIMIT * 0.85
                   ? "text-amber-500"
-                  : "text-gray-400"
+                  : "text-gray-400 dark:text-gray-500"
               }`}
             >
               {excerptLen}/{EXCERPT_LIMIT}
@@ -439,7 +439,7 @@ export default function ArticleForm({ article, categories }: Props) {
             </p>
           )}
           {excerptLen === 0 && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               This appears as the article summary and Google meta description (keep under {EXCERPT_LIMIT} chars).
             </p>
           )}
@@ -463,7 +463,7 @@ export default function ArticleForm({ article, categories }: Props) {
         </div>
 
         {/* Breaking news flag */}
-        <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+        <div className="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3">
           <input
             id="isBreaking"
             type="checkbox"
@@ -475,7 +475,7 @@ export default function ArticleForm({ article, categories }: Props) {
             <label htmlFor="isBreaking" className="text-sm font-medium cursor-pointer select-none">
               Mark as Breaking News
             </label>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               Shows a prominent{" "}
               <span className="bg-brand-red text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                 BREAKING
@@ -491,12 +491,12 @@ export default function ArticleForm({ article, categories }: Props) {
         {/* Body */}
         <div className="space-y-1">
           <Label>Body</Label>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             Click in the editor first, then use &ldquo;Insert&rdquo; on any additional photo to place it inline.
           </p>
           <RichTextEditor value={body} onChange={setBody} editorRef={editorRef} />
           {/* Word count */}
-          <div className="flex items-center justify-end gap-3 text-xs text-gray-400 pt-1">
+          <div className="flex items-center justify-end gap-3 text-xs text-gray-400 dark:text-gray-500 pt-1">
             <span>{words.toLocaleString()} words</span>
             <span>·</span>
             <span>{readingMins} min read</span>
@@ -505,7 +505,7 @@ export default function ArticleForm({ article, categories }: Props) {
 
         {/* Twitter embed */}
         <div className="space-y-1">
-          <Label htmlFor="twitterUrl">Twitter / X Post URL <span className="text-gray-400 font-normal">(optional)</span></Label>
+          <Label htmlFor="twitterUrl">Twitter / X Post URL <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span></Label>
           <Input
             id="twitterUrl"
             type="url"
@@ -513,13 +513,13 @@ export default function ArticleForm({ article, categories }: Props) {
             onChange={(e) => setTwitterUrl(e.target.value)}
             placeholder="https://twitter.com/user/status/..."
           />
-          <p className="text-xs text-gray-400">Paste a tweet URL to embed it inside the article.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">Paste a tweet URL to embed it inside the article.</p>
         </div>
 
         {/* About Authors */}
         <div className="space-y-1">
           <Label htmlFor="aboutAuthors">
-            About the Author(s) <span className="text-gray-400 font-normal">(optional)</span>
+            About the Author(s) <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
           </Label>
           <Textarea
             id="aboutAuthors"
@@ -528,7 +528,7 @@ export default function ArticleForm({ article, categories }: Props) {
             rows={4}
             placeholder={"e.g. Rina Chowdhury is a senior correspondent covering politics and governance.\n\nArjun Sen is a data journalist based in Mumbai."}
           />
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             Appears at the bottom of the published article. Use a blank line to separate multiple author bios.
           </p>
         </div>
@@ -539,7 +539,7 @@ export default function ArticleForm({ article, categories }: Props) {
           <div className="flex items-center gap-4">
             <button
               type="button"
-              className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 flex-shrink-0 hover:opacity-75 transition-opacity"
+              className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 flex-shrink-0 hover:opacity-75 transition-opacity"
               onClick={() => authorImageRef.current?.click()}
               title="Click to change photo"
             >
@@ -562,13 +562,13 @@ export default function ArticleForm({ article, categories }: Props) {
               {authorImage !== "/prasanta_profile_image.jpg" && (
                 <button
                   type="button"
-                  className="block text-xs text-gray-400 hover:text-gray-600"
+                  className="block text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                   onClick={() => setAuthorImage("/prasanta_profile_image.jpg")}
                 >
                   Reset to default
                 </button>
               )}
-              <p className="text-xs text-gray-400">Shown in the &quot;About the Author&quot; box.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Shown in the &quot;About the Author&quot; box.</p>
             </div>
           </div>
           <input

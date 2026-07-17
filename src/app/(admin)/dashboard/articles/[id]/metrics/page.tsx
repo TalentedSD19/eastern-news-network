@@ -40,7 +40,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/dashboard/articles" className="text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/dashboard/articles" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
           ← Back to Articles
         </Link>
         <h1 className="font-serif text-2xl font-bold mt-2 line-clamp-2">{article.title}</h1>
@@ -57,7 +57,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
       {/* Geo breakdown */}
       <div>
         <h2 className="font-serif text-lg font-semibold mb-3">Views by Location</h2>
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -69,7 +69,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
             <TableBody>
               {geoRows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-gray-400 py-8">
+                  <TableCell colSpan={3} className="text-center text-gray-400 dark:text-gray-500 py-8">
                     No location data yet. Geo data populates after Vercel deployment.
                   </TableCell>
                 </TableRow>
@@ -89,7 +89,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
       {/* Comments */}
       <div>
         <h2 className="font-serif text-lg font-semibold mb-3">Comments</h2>
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -101,7 +101,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
             <TableBody>
               {comments.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-gray-400 py-8">
+                  <TableCell colSpan={3} className="text-center text-gray-400 dark:text-gray-500 py-8">
                     No comments yet.
                   </TableCell>
                 </TableRow>
@@ -110,7 +110,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
                 <TableRow key={c.id}>
                   <TableCell className="font-medium whitespace-nowrap">{c.authorName}</TableCell>
                   <TableCell className="max-w-md">{c.body}</TableCell>
-                  <TableCell className="whitespace-nowrap text-gray-500">{formatDate(c.createdAt)}</TableCell>
+                  <TableCell className="whitespace-nowrap text-gray-500 dark:text-gray-400">{formatDate(c.createdAt)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

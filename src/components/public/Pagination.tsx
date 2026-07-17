@@ -27,14 +27,14 @@ export default function Pagination({ page, totalPages, basePath }: Props) {
   const nextHref = page < totalPages ? `${basePath}?page=${page + 1}` : null;
 
   const btnBase =
-    "inline-flex items-center gap-1.5 border rounded-sm px-4 py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors";
+    "inline-flex items-center gap-1.5 border rounded-sm px-4 py-2.5 sm:py-2 text-[11px] font-bold uppercase tracking-[0.1em] transition-colors";
   const btnActive =
-    "border-gray-200 text-gray-500 hover:border-brand-red hover:text-brand-red";
+    "border-gray-200 dark:border-white/15 text-gray-500 dark:text-gray-400 hover:border-brand-red hover:text-brand-red";
   const btnDisabled =
-    "border-gray-100 text-gray-300 cursor-not-allowed select-none";
+    "border-gray-100 dark:border-white/5 text-gray-300 dark:text-gray-700 cursor-not-allowed select-none";
 
   return (
-    <div className="flex items-center justify-between mt-10 pt-6 border-t border-gray-200">
+    <div className="flex items-center justify-between mt-10 pt-6 border-t border-gray-200 dark:border-white/10">
       {prevHref ? (
         <Link href={prevHref} className={`${btnBase} ${btnActive}`}>
           <ChevronLeft />
@@ -47,7 +47,7 @@ export default function Pagination({ page, totalPages, basePath }: Props) {
         </span>
       )}
 
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
+      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
         Page {page} of {totalPages}
       </p>
 

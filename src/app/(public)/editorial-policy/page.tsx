@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-12">
-      <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-400 mb-4">{title}</p>
+      <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-4">{title}</p>
       <div className="w-6 h-0.5 bg-brand-red mb-6" />
-      <div className="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-brand-red prose-strong:font-normal">
+      <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-a:text-brand-red prose-strong:font-normal">
         {children}
       </div>
     </div>
@@ -24,9 +24,9 @@ export default function EditorialPolicyPage() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-white dark:bg-neutral-950">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-10 pb-16">
-          <h1 className="text-2xl font-black uppercase tracking-[0.18em] text-gray-400 mb-5">
+          <h1 className="text-2xl font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-5">
             Editorial Policy
           </h1>
           <div className="w-10 h-0.5 bg-brand-red mb-10" />

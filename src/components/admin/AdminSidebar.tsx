@@ -7,6 +7,7 @@ import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { href: "/dashboard/articles", label: "Articles" },
@@ -44,13 +45,16 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
             <Image src="/android-chrome-192x192.png" alt="ENN" width={36} height={36} className="rounded-sm" />
             <span className="font-serif text-lg font-bold">ENN Admin</span>
           </Link>
-          <button
-            onClick={() => setMobileOpen((v) => !v)}
-            className="p-1.5 rounded-md text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle variant="onDark" />
+            <button
+              onClick={() => setMobileOpen((v) => !v)}
+              className="flex h-11 w-11 items-center justify-center rounded-md text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
 
         {mobileOpen && (
@@ -140,13 +144,14 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
           ))}
         </nav>
 
-        <div className="px-3 py-4 border-t border-white/10">
+        <div className="px-3 py-4 border-t border-white/10 flex items-center gap-1">
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-white/10 transition-colors"
+            className="flex-1 text-left px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-white/10 transition-colors"
           >
             Sign out
           </button>
+          <ThemeToggle variant="onDark" className="h-9 w-9" />
         </div>
       </aside>
     </>

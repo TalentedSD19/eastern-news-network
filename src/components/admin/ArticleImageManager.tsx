@@ -112,7 +112,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
           type="button"
           disabled={uploading}
           onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-dashed border-gray-300 hover:border-brand-red hover:text-brand-red transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-dashed border-gray-300 dark:border-white/20 hover:border-brand-red hover:text-brand-red transition-colors disabled:opacity-50"
         >
           <ImagePlus size={14} />
           {uploading ? "Uploading…" : "Add Photos"}
@@ -135,7 +135,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full flex flex-col items-center justify-center gap-2 py-14 rounded-xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-brand-red hover:text-brand-red transition-colors"
+          className="w-full flex flex-col items-center justify-center gap-2 py-14 rounded-xl border-2 border-dashed border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-brand-red hover:text-brand-red transition-colors"
         >
           <ImagePlus size={30} />
           <span className="text-sm font-medium">Click to add photos</span>
@@ -145,15 +145,15 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
 
       {/* Cover photo */}
       {cover && (
-        <div className="rounded-xl border-2 border-brand-red/40 bg-red-50/40 overflow-hidden">
+        <div className="rounded-xl border-2 border-brand-red/40 bg-red-50/40 dark:bg-brand-red/10 overflow-hidden">
           <div className="flex items-center gap-2 px-4 pt-3 pb-0">
             <span className="inline-flex items-center gap-1 bg-brand-red text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full tracking-wide">
               ★ COVER PHOTO
             </span>
-            <span className="text-xs text-gray-400">This image appears at the top of the article</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">This image appears at the top of the article</span>
           </div>
 
-          <div className="relative w-full aspect-video mt-3 bg-gray-200">
+          <div className="relative w-full aspect-video mt-3 bg-gray-200 dark:bg-white/10">
             <Image src={cover.url} alt="Cover" fill className="object-cover" unoptimized />
           </div>
 
@@ -163,7 +163,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
               value={cover.caption}
               onChange={(e) => setCaption(0, e.target.value)}
               placeholder="Add a caption for this photo…"
-              className="w-full text-sm px-3 py-1.5 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-1 focus:ring-brand-red"
+              className="w-full text-sm px-3 py-1.5 rounded-md border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-brand-red"
             />
             <div className="flex items-center gap-2">
               <IconBtn
@@ -193,7 +193,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
       {/* Additional photos */}
       {rest.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">
+          <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             Additional Photos — click &ldquo;Insert&rdquo; to place in article body
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -202,9 +202,9 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
               return (
                 <div
                   key={`${img.url}-${realIdx}`}
-                  className="rounded-lg border bg-white overflow-hidden shadow-sm flex flex-col"
+                  className="rounded-lg border dark:border-white/10 bg-white dark:bg-neutral-900 overflow-hidden shadow-sm flex flex-col"
                 >
-                  <div className="relative w-full aspect-square bg-gray-100">
+                  <div className="relative w-full aspect-square bg-gray-100 dark:bg-white/10">
                     <Image
                       src={img.url}
                       alt={img.caption || `Photo ${realIdx + 1}`}
@@ -219,7 +219,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
                       value={img.caption}
                       onChange={(e) => setCaption(realIdx, e.target.value)}
                       placeholder="Caption…"
-                      className="w-full text-xs px-2 py-1 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-brand-red"
+                      className="w-full text-xs px-2 py-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-brand-red"
                     />
 
                     <div className="flex flex-wrap gap-1 items-center">
@@ -254,7 +254,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
                         type="button"
                         title="Insert into article at cursor position"
                         onClick={() => insertIntoArticle(img)}
-                        className="ml-auto flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded border border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors"
+                        className="ml-auto flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
                       >
                         <CornerDownRight size={10} />
                         Insert
@@ -280,7 +280,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
       {/* Crop upload overlay */}
       {cropUploading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-lg px-6 py-4 text-sm text-gray-700 shadow-xl">
+          <div className="bg-white dark:bg-neutral-900 rounded-lg px-6 py-4 text-sm text-gray-700 dark:text-gray-300 shadow-xl">
             Uploading cropped image…
           </div>
         </div>
@@ -314,8 +314,8 @@ function IconBtn({
         small ? "p-0.5" : "px-2 py-1"
       } ${
         danger
-          ? "border-red-200 text-red-500 hover:bg-red-50"
-          : "border-gray-200 text-gray-500 hover:bg-gray-50"
+          ? "border-red-200 dark:border-red-500/30 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10"
+          : "border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5"
       }`}
     >
       {children}

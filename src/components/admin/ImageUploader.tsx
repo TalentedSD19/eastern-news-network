@@ -40,10 +40,10 @@ export default function ImageUploader({ value, onChange }: Props) {
         disabled={uploading}
         onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
       />
-      {uploading && <p className="text-sm text-gray-500">Uploading…</p>}
+      {uploading && <p className="text-sm text-gray-500 dark:text-gray-400">Uploading…</p>}
       {error && <p className="text-sm text-red-500">{error}</p>}
       {value && (
-        <div className="relative w-full aspect-video rounded-md overflow-hidden border">
+        <div className="relative w-full aspect-video rounded-md overflow-hidden border dark:border-white/10">
           <Image src={value} alt="Cover preview" fill className="object-cover" />
         </div>
       )}

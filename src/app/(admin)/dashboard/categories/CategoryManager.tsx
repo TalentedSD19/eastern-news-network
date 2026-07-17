@@ -60,7 +60,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
         </Button>
       </form>
       {error && <p className="text-sm text-red-500">{error}</p>}
-      <ul className="bg-white rounded-lg shadow-sm divide-y">
+      <ul className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm divide-y dark:divide-white/10">
         {categories.map((cat) => (
           <li key={cat.id} className="flex items-center justify-between px-4 py-3">
             <span className="font-medium">{cat.name}</span>
@@ -70,7 +70,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
           </li>
         ))}
         {categories.length === 0 && (
-          <li className="px-4 py-6 text-center text-gray-400 text-sm">No categories yet.</li>
+          <li className="px-4 py-6 text-center text-gray-400 dark:text-gray-500 text-sm">No categories yet.</li>
         )}
       </ul>
     </div>

@@ -35,8 +35,8 @@ export default function PublishToggleButton({ id, currentStatus }: Props) {
       onClick={handleToggle}
       className={
         isPublished
-          ? "border-amber-400 text-amber-600 hover:bg-amber-50"
-          : "border-green-500 text-green-600 hover:bg-green-50"
+          ? "border-amber-400 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10"
+          : "border-green-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10"
       }
     >
       {loading ? "…" : isPublished ? "Unpublish" : "Publish"}
