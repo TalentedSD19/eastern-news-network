@@ -53,22 +53,42 @@ model Article {
   views        ArticleView[]
   comments     Comment[]
   votes        Vote[]
+  shareClicks  ShareClick[]
 
   @@index([status, publishedAt])
   @@index([categoryId])
 }
 
 model ArticleView {
-  id        String   @id @default(cuid())
-  articleId String
-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  country   String?
-  region    String?
-  city      String?
-  viewedAt  DateTime @default(now())
+  id            String   @id @default(cuid())
+  articleId     String
+  article       Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  country       String?
+  region        String?
+  city          String?
+  referrerHost  String?
+  userAgent     String?
+  deviceType    String?
+  visitorId     String?
+  maxScrollPct  Int?
+  activeSeconds Int?
+  viewedAt      DateTime @default(now())
 
   @@index([articleId])
   @@index([articleId, country])
+  @@index([viewedAt])
+  @@index([visitorId])
+}
+
+model ShareClick {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  platform  String
+  createdAt DateTime @default(now())
+
+  @@index([articleId])
+  @@index([createdAt])
 }
 
 model Comment {

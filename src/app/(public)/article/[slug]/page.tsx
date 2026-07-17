@@ -286,7 +286,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           )}
 
           {/* ── Share ── */}
-          <ShareBar title={article.title} />
+          <ShareBar title={article.title} articleId={article.id} />
 
           {/* ── Vote section — prominently at bottom ── */}
           <VoteBar articleId={article.id} initialUp={initialUp} initialDown={initialDown} />
