@@ -66,6 +66,11 @@ export const metadata: Metadata = {
       { rel: "manifest", url: "/site.webmanifest" },
     ],
   },
+  alternates: {
+    types: {
+      "application/rss+xml": "https://easternnewsnetwork.com/rss.xml",
+    },
+  },
 };
 
 const organizationJsonLd = {

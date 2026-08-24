@@ -18,6 +18,7 @@ export default function SiteFooter() {
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <Link href="/about" className="hover:text-white transition-colors">About</Link>
             <Link href="/editorial-policy" className="hover:text-white transition-colors">Editorial Policy</Link>
+            <a href="/rss.xml" className="hover:text-white transition-colors">RSS</a>
           </nav>
         </div>
         <div className="border-t border-white/10 mt-5 pt-4 text-center text-xs text-gray-600">
