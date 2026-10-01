@@ -69,11 +69,11 @@ export default function NavigationProgress() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[99999] h-[3px] pointer-events-none">
       <div
-        className="h-full bg-brand-red"
+        className="h-full bg-brand-accent"
         style={{
           width: `${width}%`,
           transition: completing ? "width 0.25s ease-out" : undefined,
-          boxShadow: "0 1px 8px rgba(200,16,46,0.5)",
+          boxShadow: "0 1px 8px rgba(242,84,28,0.5)",
         }}
       />
     </div>

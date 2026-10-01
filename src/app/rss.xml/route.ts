@@ -47,8 +47,10 @@ export async function GET() {
       const url = `${BASE_URL}/article/${a.slug}`;
       const byline = a.reporterName ?? a.author.name;
       const pubDate = (a.publishedAt ?? a.createdAt).toUTCString();
-      const enclosure = a.coverImage
-        ? `\n      <enclosure url="${escapeXml(a.coverImage)}" type="image/jpeg" />`
+      // <enclosure> requires a byte length we don't store and a fixed MIME type;
+      // media:content is what Feedly, Google News and most readers use for thumbnails.
+      const media = a.coverImage
+        ? `\n      <media:content url="${escapeXml(a.coverImage)}" medium="image" />\n      <media:thumbnail url="${escapeXml(a.coverImage)}" />`
         : "";
 
       return `    <item>
@@ -59,19 +61,24 @@ export async function GET() {
       <category>${escapeXml(a.category.name)}</category>
       <dc:creator>${cdata(byline)}</dc:creator>
       <description>${cdata(a.excerpt)}</description>
-      <content:encoded>${cdata(a.body)}</content:encoded>${enclosure}
+      <content:encoded>${cdata(a.body)}</content:encoded>${media}
     </item>`;
     })
     .join("\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>${escapeXml(SITE_TITLE)}</title>
     <link>${BASE_URL}</link>
     <atom:link href="${BASE_URL}/rss.xml" rel="self" type="application/rss+xml" />
     <description>${escapeXml(SITE_DESCRIPTION)}</description>
     <language>en-in</language>
+    <image>
+      <url>${BASE_URL}/android-chrome-192x192.png</url>
+      <title>${escapeXml(SITE_TITLE)}</title>
+      <link>${BASE_URL}</link>
+    </image>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
 ${items}
   </channel>

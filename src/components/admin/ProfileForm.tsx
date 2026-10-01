@@ -186,7 +186,7 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
         </p>
       )}
 
-      <Button type="submit" disabled={saving || uploading} className="bg-brand-red hover:bg-brand-red/90 text-white">
+      <Button type="submit" disabled={saving || uploading} className="bg-brand-accent hover:bg-brand-accent-dark text-white">
         {saving ? "Saving…" : "Save Changes"}
       </Button>
     </form>

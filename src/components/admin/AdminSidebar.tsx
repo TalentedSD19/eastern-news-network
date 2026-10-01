@@ -26,7 +26,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const avatar = (
-    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-brand-red shrink-0 flex items-center justify-center">
+    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-brand-accent shrink-0 flex items-center justify-center">
       {avatarUrl ? (
         <Image src={avatarUrl} alt={userName} fill className="object-cover" />
       ) : (
@@ -44,7 +44,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
           <Link href="/" className="hover:opacity-90 transition-opacity flex items-center gap-2">
             <Image src="/android-chrome-192x192.png" alt="ENN" width={36} height={36} className="rounded-sm" />
-            <span className="font-serif text-lg font-bold">ENN Admin</span>
+            <span className="font-display font-semibold tracking-tight text-lg">ENN Admin</span>
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle variant="onDark" />
@@ -80,7 +80,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
                   className={cn(
                     "block px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
                     pathname.startsWith(item.href)
-                      ? "bg-brand-red text-white"
+                      ? "bg-brand-accent text-white"
                       : "text-gray-300 hover:bg-white/10"
                   )}
                 >
@@ -105,7 +105,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
         <div className="px-6 py-5 border-b border-white/10">
           <Link href="/" className="hover:opacity-90 transition-opacity flex items-center gap-2">
             <Image src="/android-chrome-192x192.png" alt="ENN" width={42} height={42} className="rounded-sm" />
-            <span className="font-serif text-xl font-bold">ENN</span>
+            <span className="font-display font-semibold tracking-tight text-xl">ENN</span>
           </Link>
         </div>
 
@@ -113,7 +113,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
           href="/dashboard/profile"
           className="flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors"
         >
-          <div className="relative w-9 h-9 rounded-full overflow-hidden bg-brand-red shrink-0 flex items-center justify-center">
+          <div className="relative w-9 h-9 rounded-full overflow-hidden bg-brand-accent shrink-0 flex items-center justify-center">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={userName} fill className="object-cover" />
             ) : (
@@ -136,7 +136,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
               className={cn(
                 "block px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 pathname.startsWith(item.href)
-                  ? "bg-brand-red text-white"
+                  ? "bg-brand-accent text-white"
                   : "text-gray-300 hover:bg-white/10"
               )}
             >

@@ -8,7 +8,7 @@ export default async function CategoriesPage() {
 
   return (
     <div>
-      <h1 className="font-serif text-2xl font-bold mb-6">Categories</h1>
+      <h1 className="font-display font-medium tracking-tight text-2xl mb-6">Categories</h1>
       <CategoryManager initialCategories={categories} />
     </div>
   );

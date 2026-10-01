@@ -150,13 +150,13 @@ export default function ShareBar({ title, articleId, compact = false }: Props) {
       label: "Email",
       href: `mailto:?subject=${enc(title)}&body=${enc(pageUrl)}`,
       icon: <EmailIcon />,
-      hover: "hover:text-brand-red hover:border-brand-red",
+      hover: "hover:text-brand-accent hover:border-brand-accent",
       sameTab: true,
     },
   ];
 
   const base =
-    "inline-flex items-center gap-1.5 border border-gray-200 dark:border-white/15 rounded-sm px-3 py-2 sm:py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-gray-500 dark:text-gray-400 transition-colors duration-150";
+    "inline-flex items-center gap-1.5 border border-gray-200 dark:border-white/15 rounded-sm px-3 py-2 sm:py-1.5 text-[13px] font-medium text-gray-500 dark:text-gray-400 transition-colors duration-150";
 
   if (compact) {
     const iconBase =
@@ -206,7 +206,7 @@ export default function ShareBar({ title, articleId, compact = false }: Props) {
 
   return (
     <section className="border-t border-gray-200 dark:border-white/10 pt-8 mb-2">
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-4">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-4">
         Share this story
       </p>
       <div className="flex flex-wrap gap-2">

@@ -109,10 +109,10 @@ export default function VoteBar({ articleId, initialUp, initialDown, compact = f
   return (
     <section className="my-12 border-t border-b border-gray-200 dark:border-white/10 py-10">
       <div className="text-center mb-8">
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">
           Reader Verdict
         </p>
-        <h3 className="font-serif text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h3 className="font-display font-medium tracking-tight text-2xl text-gray-900 dark:text-gray-50">
           How do you rate this report?
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-xs mx-auto">
@@ -144,7 +144,7 @@ export default function VoteBar({ articleId, initialUp, initialDown, compact = f
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-snug">Accurate &amp; well-sourced</p>
           </div>
           <span
-            className={`text-2xl font-black tabular-nums ${
+            className={`text-2xl font-semibold tabular-nums ${
               userVote === "UP" ? "text-emerald-600 dark:text-emerald-400" : "text-gray-500 dark:text-gray-400"
             }`}
           >
@@ -180,7 +180,7 @@ export default function VoteBar({ articleId, initialUp, initialDown, compact = f
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-snug">Questionable or inaccurate</p>
           </div>
           <span
-            className={`text-2xl font-black tabular-nums ${
+            className={`text-2xl font-semibold tabular-nums ${
               userVote === "DOWN" ? "text-rose-600 dark:text-rose-400" : "text-gray-500 dark:text-gray-400"
             }`}
           >

@@ -8,6 +8,8 @@ import ArticleGrid from "@/components/public/ArticleGrid";
 import Pagination from "@/components/public/Pagination";
 import { slugify } from "@/lib/utils";
 import type { ArticleWithRelations } from "@/types";
+import { DEFAULT_OG_IMAGE, baseOpenGraph } from "@/lib/seo";
+import { fillAuthorImages } from "@/lib/authorImages";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +27,7 @@ async function resolveByline(slug: string): Promise<string | null> {
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const byline = await resolveByline(params.slug);
-  if (!byline) return {};
+  if (!byline) notFound();
 
   const url = `${SITE_URL}/author/${params.slug}`;
   return {
@@ -33,7 +35,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     description: `Articles by ${byline} on Eastern News Network.`,
     alternates: { canonical: url },
     openGraph: {
+      ...baseOpenGraph,
       type: "profile",
+      images: [DEFAULT_OG_IMAGE],
       url,
       title: byline,
       description: `Articles by ${byline} on Eastern News Network.`,
@@ -79,6 +83,7 @@ export default async function AuthorPage({
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const articlesWithImages = await fillAuthorImages(articles);
   const bio = profile?.aboutAuthors ?? null;
   const image = profile?.authorImage ?? null;
 
@@ -104,7 +109,7 @@ export default async function AuthorPage({
       />
       <SiteHeader />
       <main className="flex-1 w-full">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-6 pb-8">
           <div className="flex items-center gap-5 mb-8">
             {image && (
               <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 shrink-0">
@@ -112,11 +117,11 @@ export default async function AuthorPage({
               </div>
             )}
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">
                 Author
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-950 dark:text-gray-50">{byline}</h1>
-              <div className="w-8 h-0.5 bg-brand-red mt-3" />
+              <h1 className="font-display font-medium tracking-tight text-3xl sm:text-4xl text-gray-950 dark:text-gray-50">{byline}</h1>
+              <div className="w-8 h-0.5 bg-brand-accent mt-3" />
             </div>
           </div>
 
@@ -126,7 +131,7 @@ export default async function AuthorPage({
             </p>
           )}
 
-          <ArticleGrid articles={articles as ArticleWithRelations[]} />
+          <ArticleGrid articles={articlesWithImages as ArticleWithRelations[]} />
           {totalPages > 1 && (
             <Pagination page={page} totalPages={totalPages} basePath={`/author/${params.slug}`} />
           )}

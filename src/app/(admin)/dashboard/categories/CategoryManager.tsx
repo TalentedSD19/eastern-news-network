@@ -55,7 +55,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <Button type="submit" disabled={adding} className="bg-brand-red hover:bg-brand-red/90 text-white shrink-0">
+        <Button type="submit" disabled={adding} className="bg-brand-accent hover:bg-brand-accent-dark text-white shrink-0">
           {adding ? "Adding…" : "Add"}
         </Button>
       </form>

@@ -17,7 +17,7 @@ export default async function ProfilePage() {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl font-bold mb-8">My Profile</h1>
+      <h1 className="font-display font-medium tracking-tight text-3xl mb-8">My Profile</h1>
       <ProfileForm initial={user} />
     </div>
   );

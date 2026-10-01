@@ -12,10 +12,16 @@ interface ThemeToggleProps {
 }
 
 export default function ThemeToggle({ className, variant = "default" }: ThemeToggleProps) {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  // The site used to follow the OS theme; with that disabled, a leftover stored
+  // "system" value is treated as a theme name of its own and the toggle sticks.
+  useEffect(() => {
+    if (theme === "system") setTheme("light");
+  }, [theme, setTheme]);
 
   if (!mounted) {
     return (

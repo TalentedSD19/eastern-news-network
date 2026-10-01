@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Inter_Tight } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import NavigationProgress from "@/components/public/NavigationProgress";
+import { jsonLdScript } from "@/lib/seo";
 
-const playfair = Playfair_Display({
+// The design mockups use a single tight neo-grotesk for headlines and body;
+// headlines sit at medium (500) weight rather than a heavy display face.
+const interTight = Inter_Tight({
   subsets: ["latin"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -92,11 +90,11 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
-      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-stone-50 text-gray-900 dark:bg-neutral-950 dark:text-gray-100 flex flex-col min-h-screen overflow-x-hidden w-full`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${interTight.variable} font-sans antialiased bg-stone-50 text-gray-900 dark:bg-background dark:text-gray-100 flex flex-col min-h-screen overflow-x-hidden w-full`}>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationJsonLd) }}
         />
         <Providers>
           <NavigationProgress />

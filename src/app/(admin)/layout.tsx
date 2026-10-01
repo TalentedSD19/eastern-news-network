@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: "Dashboard — Eastern News Network",
   icons: {
     icon: [
@@ -35,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         userName={user?.name ?? session.user.name ?? "Admin"}
         avatarUrl={user?.avatarUrl ?? null}
       />
-      <div className="flex-1 bg-gray-50 dark:bg-neutral-950 text-gray-900 dark:text-gray-100 p-4 sm:p-6 md:p-8 overflow-auto">{children}</div>
+      <div className="flex-1 bg-gray-50 dark:bg-background text-gray-900 dark:text-gray-100 p-4 sm:p-6 md:p-8 overflow-auto">{children}</div>
     </div>
   );
 }
