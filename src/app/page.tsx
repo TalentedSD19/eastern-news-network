@@ -29,11 +29,11 @@ export const metadata: Metadata = {
   },
 };
 
-// Front-page layout is hero(1) + side list(4) + duo(2) + grid(8) — the grid count
+// Front-page layout is hero(1) + duo(2) + side list(3) + grid(8) — the grid count
 // is a clean multiple of both the 2-col and 4-col breakpoints so no row is left
 // half-empty. Later pages are a plain 4-col grid, so they take 16 (4 full rows)
-// rather than 15, which would leave the last row with 3.
-const FRONT_PAGE_SIZE = 15;
+// rather than 14, which would leave the last row with 2.
+const FRONT_PAGE_SIZE = 14;
 const PAGE_SIZE = 16;
 
 export default async function HomePage({
@@ -64,10 +64,12 @@ export default async function HomePage({
 
   // Page 1 gets the full magazine-style layout; later pages are a plain grid.
   const isFrontPage = page === 1 && typed.length > 0;
+  // Recency order: newest is the hero, the next three fill the side list, then
+  // the following two are the feature pair below.
   const hero = isFrontPage ? typed[0] : null;
-  const sideList = isFrontPage ? typed.slice(1, 5) : [];
-  const duo = isFrontPage ? typed.slice(5, 7) : [];
-  const rest = isFrontPage ? typed.slice(7) : typed;
+  const sideList = isFrontPage ? typed.slice(1, 4) : [];
+  const duo = isFrontPage ? typed.slice(4, 6) : [];
+  const rest = isFrontPage ? typed.slice(6) : typed;
 
   // Spotlight section (mirrors the mockup's category-themed block): whichever
   // category has the most published articles gets its own mini-grid up front.
@@ -107,7 +109,7 @@ export default async function HomePage({
     <>
       <SiteHeader />
       <main className="flex-1 w-full">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-6 sm:pt-7 pb-8 sm:pb-10 space-y-12 sm:space-y-16">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-4 sm:pt-5 pb-8 sm:pb-10 space-y-12 sm:space-y-16">
           {hero && (
             <section>
               <HeroFeature hero={hero} sideList={sideList} />

@@ -25,6 +25,10 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
             <span className="text-gray-300 dark:text-gray-600 text-xs tracking-widest uppercase">No image</span>
           </div>
         )}
+        {/* Excerpt revealed on hover */}
+        <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/85 via-black/60 to-black/20 p-3 sm:p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <p className="text-[13px] leading-relaxed text-white/95 line-clamp-4">{article.excerpt}</p>
+        </div>
       </div>
 
       {/* Content */}

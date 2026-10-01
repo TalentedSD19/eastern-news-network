@@ -77,6 +77,10 @@ export default function CategoryNav({ categories }: { categories: Category[] }) 
             {cat.name}
           </Link>
         ))}
+
+        <Link href="/about" className={linkClass(pathname === "/about")}>
+          About
+        </Link>
       </nav>
 
       {canScrollRight && (

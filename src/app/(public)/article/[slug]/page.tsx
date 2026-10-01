@@ -236,7 +236,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       <main className="flex-1 bg-white dark:bg-background">
 
         {/* ── Article header ── */}
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-7 pb-2">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-5 pb-2">
 
           {/* Category + Breaking */}
           <div className="flex items-center gap-3 mb-5">
