@@ -45,7 +45,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
       <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
         Discussion
       </p>
-      <h2 className="font-serif text-2xl font-bold text-gray-900 dark:text-gray-50 mb-8">
+      <h2 className="font-display font-extrabold text-2xl text-gray-900 dark:text-gray-50 mb-8">
         Reader Comments
         {comments.length > 0 && (
           <span className="ml-2 text-base font-normal text-gray-400 dark:text-gray-500">({comments.length})</span>
@@ -67,7 +67,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           onChange={(e) => setName(e.target.value)}
           required
           maxLength={100}
-          className="w-full rounded-sm border border-gray-300 dark:border-white/15 bg-white dark:bg-white/5 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-red focus:border-brand-red transition"
+          className="w-full rounded-sm border border-gray-300 dark:border-white/15 bg-white dark:bg-white/5 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-accent focus:border-brand-accent transition"
         />
         <textarea
           placeholder="Share your thoughts on this article…"
@@ -76,14 +76,14 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           required
           maxLength={2000}
           rows={4}
-          className="w-full rounded-sm border border-gray-300 dark:border-white/15 bg-white dark:bg-white/5 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-red focus:border-brand-red transition resize-none"
+          className="w-full rounded-sm border border-gray-300 dark:border-white/15 bg-white dark:bg-white/5 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-accent focus:border-brand-accent transition resize-none"
         />
         <div className="flex items-center justify-between">
           <p className="text-xs text-gray-400 dark:text-gray-500">{body.length}/2000 characters</p>
           <button
             type="submit"
             disabled={submitting}
-            className="px-5 py-2.5 sm:py-2 rounded-sm bg-brand-red text-white text-sm font-semibold hover:bg-brand-red/90 disabled:opacity-50 transition-colors"
+            className="px-5 py-2.5 sm:py-2 rounded-sm bg-brand-accent text-white text-sm font-semibold hover:bg-brand-accent-dark disabled:opacity-50 transition-colors"
           >
             {submitting ? "Posting…" : "Post Comment"}
           </button>

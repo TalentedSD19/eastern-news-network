@@ -112,7 +112,7 @@ export default function VoteBar({ articleId, initialUp, initialDown, compact = f
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
           Reader Verdict
         </p>
-        <h3 className="font-serif text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h3 className="font-display font-extrabold text-2xl text-gray-900 dark:text-gray-50">
           How do you rate this report?
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-xs mx-auto">

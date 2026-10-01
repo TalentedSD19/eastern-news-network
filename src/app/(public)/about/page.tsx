@@ -20,18 +20,18 @@ export default function AboutPage() {
           <h1 className="text-2xl font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-5">
             About
           </h1>
-          <div className="w-10 h-0.5 bg-brand-red mb-8" />
+          <div className="w-10 h-0.5 bg-brand-accent mb-8" />
 
           {/* Opening statement */}
-          <p className="font-serif text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+          <p className="font-sans text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
             Eastern News Network is an independent news publication catering to a diverse palette
             of news stories and features from the East as also the World.
           </p>
-          <p className="font-serif text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+          <p className="font-sans text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
             Embedded in communities across the region, delivering ground-level reporting that
             national outlets often miss.
           </p>
-          <p className="font-serif text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-14">
+          <p className="font-sans text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-14">
             The reportage endeavours to deliver stuff where the light is seldom shed.
           </p>
 
@@ -39,10 +39,10 @@ export default function AboutPage() {
           <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-4">
             Background
           </p>
-          <div className="w-6 h-0.5 bg-brand-red mb-8" />
+          <div className="w-6 h-0.5 bg-brand-accent mb-8" />
 
           {/* Narrative — uses the same prose class as ArticleBody */}
-          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-a:text-brand-red prose-strong:font-normal prose-em:not-italic mb-14">
+          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-extrabold prose-a:text-brand-accent prose-strong:font-normal prose-em:not-italic mb-14">
             <p>
               I remember the exact moment the idea first took hold — sitting in a dimly lit room,
               scrolling through headlines that felt distant, disconnected.
@@ -123,21 +123,21 @@ export default function AboutPage() {
 
             {/* Name + contact */}
             <div>
-              <p className="font-serif text-2xl text-gray-950 dark:text-gray-50 mb-0.5">Prasanta Paul</p>
-              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-brand-red mb-3">
+              <p className="font-display font-extrabold text-2xl text-gray-950 dark:text-gray-50 mb-0.5">Prasanta Paul</p>
+              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-brand-accent mb-3">
                 Editor, India
               </p>
               <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
                 <p>
                   <a
                     href="mailto:journo41@gmail.com"
-                    className="hover:text-brand-red transition-colors"
+                    className="hover:text-brand-accent transition-colors"
                   >
                     journo41@gmail.com
                   </a>
                 </p>
                 <p>
-                  <a href="tel:+919433005558" className="hover:text-brand-red transition-colors">
+                  <a href="tel:+919433005558" className="hover:text-brand-accent transition-colors">
                     +91 94330 05558
                   </a>
                 </p>

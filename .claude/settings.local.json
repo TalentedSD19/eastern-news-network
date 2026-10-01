@@ -31,7 +31,21 @@
       "Bash(findstr \":3000 \\\\|:3001 \\\\|:3002 \\\\|:3003 \\\\|:4000 \\\\|:8080 \")",
       "Bash(taskkill *)",
       "PowerShell(Stop-Process *)",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(node *)",
+      "Bash(npx playwright *)",
+      "Bash(cat)",
+      "Bash(playwright --version)",
+      "Bash(Get-ChildItem -Path \"C:\\\\D\\\\KODING SHITZ\\\\eastern-news-network\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(Select-String -Path \"C:\\\\D\\\\KODING SHITZ\\\\eastern-news-network\\\\node_modules\\\\.prisma\\\\client\\\\index.d.ts\" -Pattern \"authorImage\")",
+      "Bash(Select-Object -First 5)",
+      "Bash(python -c \"import zipfile; z = zipfile.ZipFile\\('public/favicon_io.zip'\\); print\\('\\\\n'.join\\(z.namelist\\(\\)\\)\\)\")",
+      "Bash(Remove-Item -Recurse -Force .next)",
+      "Bash(xargs grep -l \"robots\")",
+      "Bash(xargs grep -l \"generateMetadata\\\\|metadata:\")",
+      "Bash(Expand-Archive -Path favicon_io.zip -DestinationPath favicon_io_extracted -Force)",
+      "Bash(git commit *)"
     ]
   }
 }

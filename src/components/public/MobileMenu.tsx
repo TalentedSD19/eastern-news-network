@@ -29,7 +29,7 @@ export default function MobileMenu({ categories }: { categories: Category[] }) {
     cn(
       "block px-4 py-3 text-sm font-medium transition-colors border-l-2",
       active
-        ? "text-brand-red border-brand-red bg-red-50 dark:bg-brand-red/10"
+        ? "text-brand-accent border-brand-accent bg-brand-accent-light dark:bg-brand-accent/10"
         : "text-gray-700 border-transparent hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
     );
 
@@ -37,7 +37,7 @@ export default function MobileMenu({ categories }: { categories: Category[] }) {
     <div ref={ref} className="sm:hidden flex items-center">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex h-11 w-11 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10 transition-colors"
+        className="flex h-11 w-11 items-center justify-center rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
         aria-label={open ? "Close menu" : "Open menu"}
       >
         {open ? <X size={22} /> : <Menu size={22} />}

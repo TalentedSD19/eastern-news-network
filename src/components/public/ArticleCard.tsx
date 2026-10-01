@@ -1,16 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArticleWithRelations } from "@/types";
-import { formatDate } from "@/lib/utils";
+import { readingTime } from "@/lib/utils";
 
 export default function ArticleCard({ article, priority = false }: { article: ArticleWithRelations; priority?: boolean }) {
+  const mins = readingTime(article.body);
+  const byline = article.reporterName ?? article.author.name;
+
   return (
-    <Link
-      href={`/article/${article.slug}`}
-      className="group block bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10 overflow-hidden hover:shadow-md dark:hover:shadow-black/40 transition-shadow duration-200"
-    >
+    <Link href={`/article/${article.slug}`} className="group block">
       {/* Image */}
-      <div className="relative aspect-video w-full overflow-hidden bg-gray-100 dark:bg-white/5">
+      <div className="relative aspect-video w-full overflow-hidden rounded-md bg-gray-100 dark:bg-white/5">
         {article.coverImage ? (
           <Image
             src={article.coverImage}
@@ -28,20 +28,24 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
       </div>
 
       {/* Content */}
-      <div className="p-4 border-t border-gray-100 dark:border-white/10">
-        <span className="inline-block text-[0.65rem] font-semibold tracking-widest uppercase text-brand-red mb-2">
-          {article.category.name}
-        </span>
-        <h2 className="font-serif font-bold text-[1.05rem] leading-snug mb-2 line-clamp-2 text-gray-900 dark:text-gray-50 group-hover:text-brand-red transition-colors duration-150">
+      <div className="pt-3">
+        <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 mb-1.5">
+          <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center text-[0.6rem] font-bold text-gray-500 dark:text-gray-400 shrink-0 overflow-hidden">
+            {article.authorImage ? (
+              <Image src={article.authorImage} alt={byline} width={20} height={20} className="w-full h-full object-cover" />
+            ) : (
+              byline.charAt(0).toUpperCase()
+            )}
+          </div>
+          <span className="font-medium text-gray-600 dark:text-gray-300">{byline}</span>
+        </div>
+        <h2 className="font-display font-extrabold text-[1.05rem] leading-snug mb-1.5 line-clamp-2 text-gray-900 dark:text-gray-50 group-hover:text-brand-accent transition-colors duration-150">
           {article.title}
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-3 leading-relaxed font-sans">
-          {article.excerpt}
-        </p>
-        <div className="text-[0.7rem] text-gray-400 dark:text-gray-500 font-sans tracking-wide uppercase">
-          {article.reporterName ?? article.author.name}
-          <span className="mx-1.5">·</span>
-          {formatDate(article.publishedAt ?? article.createdAt)}
+        <div className="flex items-center gap-1.5 text-[0.68rem]">
+          <span className="font-bold tracking-wide uppercase text-brand-accent">{article.category.name}</span>
+          <span className="text-gray-300 dark:text-gray-600">·</span>
+          <span className="text-gray-400 dark:text-gray-500 font-semibold">{mins} min read</span>
         </div>
       </div>
     </Link>

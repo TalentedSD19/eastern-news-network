@@ -150,7 +150,7 @@ export default function ShareBar({ title, articleId, compact = false }: Props) {
       label: "Email",
       href: `mailto:?subject=${enc(title)}&body=${enc(pageUrl)}`,
       icon: <EmailIcon />,
-      hover: "hover:text-brand-red hover:border-brand-red",
+      hover: "hover:text-brand-accent hover:border-brand-accent",
       sameTab: true,
     },
   ];

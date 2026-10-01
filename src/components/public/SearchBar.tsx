@@ -14,11 +14,13 @@ type SearchResult = {
   category: { name: string; slug: string };
 };
 
-export default function SearchBar({ wide = false }: { wide?: boolean }) {
+export default function SearchBar({ wide = false, onDark = false }: { wide?: boolean; onDark?: boolean }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  // Collapsed icon-button state only applies to the compact (non-wide) header variant.
+  const [expanded, setExpanded] = useState(wide);
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,11 +29,12 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
     function handlePointerDown(e: PointerEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
+        if (!wide && !query.trim()) setExpanded(false);
       }
     }
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, []);
+  }, [wide, query]);
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -69,34 +72,67 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
     inputRef.current?.focus();
   }
 
+  function openSearch() {
+    setExpanded(true);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }
+
+  function handleEscape() {
+    setOpen(false);
+    if (!wide && !query.trim()) setExpanded(false);
+  }
+
+  if (!wide && !expanded) {
+    return (
+      <button
+        type="button"
+        onClick={openSearch}
+        aria-label="Open search"
+        className={`flex h-9 w-9 items-center justify-center rounded-md border transition-colors shrink-0 ${
+          onDark
+            ? "border-white/20 text-gray-300 hover:bg-white/10 hover:text-white"
+            : "border-gray-200 dark:border-white/15 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
+        }`}
+      >
+        <Search size={16} />
+      </button>
+    );
+  }
+
   return (
     <div ref={containerRef} className="relative">
       <div
-        className={`flex items-center bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-full px-3 py-1.5 gap-2 focus-within:bg-white dark:focus-within:bg-white/5 focus-within:border-gray-400 dark:focus-within:border-gray-500 focus-within:shadow-sm transition-all ${
-          wide ? "w-full" : "w-48"
+        className={`flex items-center rounded-md px-3 py-1.5 gap-2 transition-all ${
+          wide ? "w-full" : "w-56"
+        } ${
+          onDark
+            ? "bg-white/10 border border-white/20 focus-within:bg-white/15 focus-within:border-white/30"
+            : "bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/10 focus-within:bg-white dark:focus-within:bg-white/5 focus-within:border-gray-400 dark:focus-within:border-gray-500 focus-within:shadow-sm"
         }`}
       >
-        <Search size={13} className="text-gray-400 shrink-0" />
+        <Search size={13} className={`shrink-0 ${onDark ? "text-gray-300" : "text-gray-400"}`} />
         <input
           ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+          onKeyDown={(e) => e.key === "Escape" && handleEscape()}
           onFocus={() => { if (results.length > 0) setOpen(true); }}
           placeholder="Search articles…"
-          className="bg-transparent text-gray-900 dark:text-gray-100 text-sm placeholder-gray-400 outline-none w-full min-w-0"
+          className={`bg-transparent text-sm outline-none w-full min-w-0 ${
+            onDark ? "text-white placeholder-gray-400" : "text-gray-900 dark:text-gray-100 placeholder-gray-400"
+          }`}
         />
-        {query && (
-          <button
-            type="button"
-            onPointerDown={(e) => e.preventDefault()}
-            onClick={clear}
-            className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors shrink-0"
-          >
-            <X size={13} />
-          </button>
-        )}
+        <button
+          type="button"
+          onPointerDown={(e) => e.preventDefault()}
+          onClick={() => (query ? clear() : handleEscape())}
+          className={`shrink-0 transition-colors ${
+            onDark ? "text-gray-300 hover:text-white" : "text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          }`}
+        >
+          <X size={13} />
+        </button>
       </div>
 
       {open && (
@@ -132,7 +168,7 @@ export default function SearchBar({ wide = false }: { wide?: boolean }) {
                       <div className="w-14 h-10 rounded bg-gray-100 dark:bg-white/10 shrink-0 self-start mt-0.5" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-[0.7rem] font-semibold text-brand-red mb-0.5 uppercase tracking-wide">
+                      <p className="text-[0.7rem] font-semibold text-brand-accent mb-0.5 uppercase tracking-wide">
                         {article.category.name}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug line-clamp-2">

@@ -13,20 +13,11 @@ import ShareBar from "@/components/public/ShareBar";
 import CommentSection from "@/components/public/CommentSection";
 import TweetEmbed from "@/components/public/TweetEmbed";
 import ArticleGrid from "@/components/public/ArticleGrid";
-import { formatDateTimeIST, slugify } from "@/lib/utils";
+import { formatDateTimeIST, readingTime, slugify } from "@/lib/utils";
 import { extractTweetId } from "@/lib/extractTweetId";
 import type { ArticleWithRelations } from "@/types";
 
 export const dynamic = "force-dynamic";
-
-function readingTime(html: string): number {
-  const wordCount = html
-    .replace(/<[^>]+>/g, " ")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean).length;
-  return Math.max(1, Math.round(wordCount / 200));
-}
 
 function CalendarIcon() {
   return (
@@ -224,32 +215,32 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           {/* Category + Breaking */}
           <div className="flex items-center gap-3 mb-5">
             {isBreaking && (
-              <span className="bg-brand-red text-white text-[10px] font-black px-2.5 py-1 rounded-sm tracking-[0.15em] uppercase animate-pulse">
+              <span className="bg-brand-accent text-white text-[10px] font-black px-2.5 py-1 rounded-sm tracking-[0.15em] uppercase animate-pulse">
                 Breaking
               </span>
             )}
             <Link
               href={`/category/${article.category.slug}`}
-              className="text-brand-red text-[11px] font-black uppercase tracking-[0.15em] hover:underline underline-offset-2"
+              className="text-brand-accent text-[11px] font-black uppercase tracking-[0.15em] hover:underline underline-offset-2"
             >
               {article.category.name}
             </Link>
           </div>
 
           {/* Headline */}
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-[1.15] text-gray-950 dark:text-gray-50 mb-4">
+          <h1 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] text-gray-950 dark:text-gray-50 mb-4">
             {article.title}
           </h1>
 
           {/* Deck / subtitle */}
           {subtitle && (
-            <p className="font-serif text-xl text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+            <p className="font-sans text-xl text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
               {subtitle}
             </p>
           )}
 
           {/* Thin rule */}
-          <div className="w-10 h-0.5 bg-brand-red mb-5" />
+          <div className="w-10 h-0.5 bg-brand-accent mb-5" />
 
           {/* Byline + meta */}
           <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4 text-[13px] text-gray-500 dark:text-gray-400 mb-8">
@@ -258,7 +249,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 <UserIcon />
                 <Link
                   href={`/author/${slugify(byline)}`}
-                  className="font-semibold text-gray-800 dark:text-gray-200 hover:text-brand-red transition-colors"
+                  className="font-semibold text-gray-800 dark:text-gray-200 hover:text-brand-accent transition-colors"
                 >
                   By {byline}
                 </Link>
@@ -296,7 +287,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         {/* ── Cover image ── */}
         {article.coverImage && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 mb-10">
-            <figure className="relative w-full aspect-[16/9] rounded-sm overflow-hidden bg-gray-100 dark:bg-white/5">
+            <figure className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-gray-100 dark:bg-white/5">
               <Image
                 src={article.coverImage}
                 alt={article.title}
@@ -321,7 +312,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
           {/* About the Author(s) */}
           {aboutAuthors && (
-            <div className="mt-12 mb-8 border-t-2 border-brand-red pt-8">
+            <div className="mt-12 mb-8 border-t-2 border-brand-accent pt-8">
               <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-6 text-center">
                 About the {multipleAuthors ? "Authors" : "Author"}
               </p>
@@ -350,7 +341,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <div className="border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.02]">
             <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-14">
               <div className="flex items-center gap-3 mb-8">
-                <h2 className="font-serif text-2xl font-bold text-gray-900 dark:text-gray-50 whitespace-nowrap">
+                <h2 className="font-display font-extrabold text-2xl text-gray-900 dark:text-gray-50 whitespace-nowrap">
                   Similar Stories
                 </h2>
                 <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />

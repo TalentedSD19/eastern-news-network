@@ -21,8 +21,8 @@ export default function ArticleLoading() {
             <div className="h-5 bg-gray-100 dark:bg-white/5 rounded w-2/3" />
           </div>
 
-          {/* Red rule */}
-          <div className="w-10 h-0.5 bg-brand-red mb-5" />
+          {/* Accent rule */}
+          <div className="w-10 h-0.5 bg-brand-accent mb-5" />
 
           {/* Byline row */}
           <div className="flex justify-between mb-8 gap-4">

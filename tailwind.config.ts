@@ -45,6 +45,11 @@ const config: Config = {
         },
         "brand-red": "#C8102E",
         "brand-dark": "#111111",
+        "brand-accent": {
+          DEFAULT: "#F2541C",
+          dark: "#D8430F",
+          light: "#FFF1EC",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -54,6 +59,7 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-playfair)", "Georgia", "serif"],
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-archivo)", "Arial Black", "sans-serif"],
       },
     },
   },

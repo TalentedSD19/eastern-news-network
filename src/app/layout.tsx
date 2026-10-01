@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import NavigationProgress from "@/components/public/NavigationProgress";
 
-const playfair = Playfair_Display({
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  variable: "--font-archivo",
+  weight: ["700", "800", "900"],
   display: "swap",
 });
 
@@ -92,8 +93,8 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
-      <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-stone-50 text-gray-900 dark:bg-neutral-950 dark:text-gray-100 flex flex-col min-h-screen overflow-x-hidden w-full`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${archivo.variable} ${inter.variable} font-sans antialiased bg-stone-50 text-gray-900 dark:bg-neutral-950 dark:text-gray-100 flex flex-col min-h-screen overflow-x-hidden w-full`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

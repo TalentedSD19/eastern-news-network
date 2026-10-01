@@ -115,8 +115,8 @@ export default async function AuthorPage({
               <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
                 Author
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-950 dark:text-gray-50">{byline}</h1>
-              <div className="w-8 h-0.5 bg-brand-red mt-3" />
+              <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-gray-950 dark:text-gray-50">{byline}</h1>
+              <div className="w-8 h-0.5 bg-brand-accent mt-3" />
             </div>
           </div>
 
