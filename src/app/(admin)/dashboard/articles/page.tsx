@@ -31,7 +31,7 @@ export default async function ArticlesListPage({
     orderBy: { createdAt: "desc" },
     include: {
       category: { select: { name: true } },
-      _count: { select: { views: true } },
+      _count: { select: { views: true, comments: true } },
     },
   });
 
@@ -70,8 +70,8 @@ export default async function ArticlesListPage({
               <TableHead>Category</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Views</TableHead>
-              <TableHead>Upvotes</TableHead>
-              <TableHead>Downvotes</TableHead>
+              <TableHead>Votes</TableHead>
+              <TableHead>Comments</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -89,12 +89,12 @@ export default async function ArticlesListPage({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-gray-500 dark:text-gray-400">{a._count.views}</TableCell>
-                  <TableCell className="text-emerald-600 dark:text-emerald-400 font-semibold">
-                    {votes.up}
+                  <TableCell className="font-semibold tabular-nums whitespace-nowrap" title={`${votes.up} up / ${votes.down} down`}>
+                    <span className="text-emerald-600 dark:text-emerald-400">{votes.up}</span>
+                    <span className="text-gray-300 dark:text-gray-600 mx-0.5">/</span>
+                    <span className="text-rose-600 dark:text-rose-400">{votes.down}</span>
                   </TableCell>
-                  <TableCell className="text-rose-600 dark:text-rose-400 font-semibold">
-                    {votes.down}
-                  </TableCell>
+                  <TableCell className="text-gray-500 dark:text-gray-400 tabular-nums">{a._count.comments}</TableCell>
                   <TableCell>{formatDate(a.createdAt)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">

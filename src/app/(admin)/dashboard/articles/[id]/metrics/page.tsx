@@ -108,9 +108,12 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
               )}
               {comments.map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="font-medium whitespace-nowrap">{c.authorName}</TableCell>
-                  <TableCell className="max-w-md">{c.body}</TableCell>
-                  <TableCell className="whitespace-nowrap text-gray-500 dark:text-gray-400">{formatDate(c.createdAt)}</TableCell>
+                  <TableCell className="font-medium whitespace-nowrap align-top">{c.authorName}</TableCell>
+                  {/* TableCell defaults to nowrap; comments need to wrap (incl. long URLs) */}
+                  <TableCell className="w-full min-w-[16rem] whitespace-pre-wrap [overflow-wrap:anywhere] leading-relaxed align-top">
+                    {c.body}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap align-top text-gray-500 dark:text-gray-400">{formatDate(c.createdAt)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

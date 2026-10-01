@@ -74,7 +74,7 @@ export default async function CategoryPage({
     <>
       <SiteHeader />
       <main className="flex-1 w-full">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-6 pb-8">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-4 pb-8">
           <div className="mb-8">
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">
               Category

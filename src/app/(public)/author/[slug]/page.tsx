@@ -109,7 +109,7 @@ export default async function AuthorPage({
       />
       <SiteHeader />
       <main className="flex-1 w-full">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-6 pb-8">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-4 pb-8">
           <div className="flex items-center gap-5 mb-8">
             {image && (
               <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 shrink-0">

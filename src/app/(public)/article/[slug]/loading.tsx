@@ -5,7 +5,7 @@ export default function ArticleLoading() {
     <>
       <HeaderSkeleton />
       <main className="flex-1 bg-white dark:bg-background">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-7 pb-16 animate-pulse">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-5 pb-16 animate-pulse">
           {/* Category */}
           <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-20 mb-5" />
 

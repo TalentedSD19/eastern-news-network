@@ -25,7 +25,7 @@ export default function EditorialPolicyPage() {
     <>
       <SiteHeader />
       <main className="flex-1 bg-white dark:bg-background">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-7 pb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-5 pb-16">
           <h1 className="text-2xl font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-5">
             Editorial Policy
           </h1>
