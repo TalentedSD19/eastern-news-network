@@ -112,7 +112,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
           type="button"
           disabled={uploading}
           onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-dashed border-gray-300 dark:border-white/20 hover:border-brand-red hover:text-brand-red transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-dashed border-gray-300 dark:border-white/20 hover:border-brand-accent hover:text-brand-accent transition-colors disabled:opacity-50"
         >
           <ImagePlus size={14} />
           {uploading ? "Uploading…" : "Add Photos"}
@@ -135,7 +135,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full flex flex-col items-center justify-center gap-2 py-14 rounded-xl border-2 border-dashed border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-brand-red hover:text-brand-red transition-colors"
+          className="w-full flex flex-col items-center justify-center gap-2 py-14 rounded-xl border-2 border-dashed border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-brand-accent hover:text-brand-accent transition-colors"
         >
           <ImagePlus size={30} />
           <span className="text-sm font-medium">Click to add photos</span>
@@ -145,9 +145,9 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
 
       {/* Cover photo */}
       {cover && (
-        <div className="rounded-xl border-2 border-brand-red/40 bg-red-50/40 dark:bg-brand-red/10 overflow-hidden">
+        <div className="rounded-xl border-2 border-brand-accent/40 bg-brand-accent-light/60 dark:bg-brand-accent/10 overflow-hidden">
           <div className="flex items-center gap-2 px-4 pt-3 pb-0">
-            <span className="inline-flex items-center gap-1 bg-brand-red text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full tracking-wide">
+            <span className="inline-flex items-center gap-1 bg-brand-accent text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full tracking-wide">
               ★ COVER PHOTO
             </span>
             <span className="text-xs text-gray-400 dark:text-gray-500">This image appears at the top of the article</span>
@@ -163,7 +163,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
               value={cover.caption}
               onChange={(e) => setCaption(0, e.target.value)}
               placeholder="Add a caption for this photo…"
-              className="w-full text-sm px-3 py-1.5 rounded-md border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-brand-red"
+              className="w-full text-sm px-3 py-1.5 rounded-md border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-brand-accent"
             />
             <div className="flex items-center gap-2">
               <IconBtn
@@ -219,7 +219,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
                       value={img.caption}
                       onChange={(e) => setCaption(realIdx, e.target.value)}
                       placeholder="Caption…"
-                      className="w-full text-xs px-2 py-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-brand-red"
+                      className="w-full text-xs px-2 py-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-brand-accent"
                     />
 
                     <div className="flex flex-wrap gap-1 items-center">

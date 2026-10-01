@@ -168,7 +168,7 @@ export default function SearchBar({ wide = false, onDark = false }: { wide?: boo
                       <div className="w-14 h-10 rounded bg-gray-100 dark:bg-white/10 shrink-0 self-start mt-0.5" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-[0.7rem] font-semibold text-brand-accent mb-0.5 uppercase tracking-wide">
+                      <p className="text-xs text-brand-accent mb-0.5">
                         {article.category.name}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug line-clamp-2">

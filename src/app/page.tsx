@@ -8,6 +8,8 @@ import HeroFeature from "@/components/public/HeroFeature";
 import FeatureDuo from "@/components/public/FeatureDuo";
 import Pagination from "@/components/public/Pagination";
 import type { ArticleWithRelations } from "@/types";
+import { DEFAULT_OG_IMAGE, baseOpenGraph } from "@/lib/seo";
+import { fillAuthorImages } from "@/lib/authorImages";
 
 export const dynamic = "force-dynamic";
 
@@ -18,15 +20,21 @@ export const metadata: Metadata = {
     canonical: "https://easternnewsnetwork.com",
   },
   openGraph: {
+    ...baseOpenGraph,
     url: "https://easternnewsnetwork.com",
     type: "website",
+    title: "Eastern News Network",
+    description: "Independent news from the East — politics, economy, society, and culture. Breaking news, analysis, and in-depth coverage.",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 
 // Front-page layout is hero(1) + side list(4) + duo(2) + grid(8) — the grid count
 // is a clean multiple of both the 2-col and 4-col breakpoints so no row is left
-// half-empty. Later pages fall back to a plain grid at the same page size.
-const PAGE_SIZE = 15;
+// half-empty. Later pages are a plain 4-col grid, so they take 16 (4 full rows)
+// rather than 15, which would leave the last row with 3.
+const FRONT_PAGE_SIZE = 15;
+const PAGE_SIZE = 16;
 
 export default async function HomePage({
   searchParams,
@@ -34,13 +42,14 @@ export default async function HomePage({
   searchParams: { page?: string };
 }) {
   const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
-  const skip = (page - 1) * PAGE_SIZE;
+  const take = page === 1 ? FRONT_PAGE_SIZE : PAGE_SIZE;
+  const skip = page === 1 ? 0 : FRONT_PAGE_SIZE + (page - 2) * PAGE_SIZE;
 
   const [articles, total] = await Promise.all([
     prisma.article.findMany({
       where: { status: "PUBLISHED" },
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-      take: PAGE_SIZE,
+      take,
       skip,
       include: {
         author: { select: { id: true, name: true } },
@@ -50,8 +59,8 @@ export default async function HomePage({
     prisma.article.count({ where: { status: "PUBLISHED" } }),
   ]);
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-  const typed = articles as ArticleWithRelations[];
+  const totalPages = total <= FRONT_PAGE_SIZE ? 1 : 1 + Math.ceil((total - FRONT_PAGE_SIZE) / PAGE_SIZE);
+  const typed = (await fillAuthorImages(articles)) as ArticleWithRelations[];
 
   // Page 1 gets the full magazine-style layout; later pages are a plain grid.
   const isFrontPage = page === 1 && typed.length > 0;
@@ -87,7 +96,7 @@ export default async function HomePage({
           category: { select: { id: true, name: true, slug: true } },
         },
       });
-      spotlightArticles = spotlightArticlesRaw as ArticleWithRelations[];
+      spotlightArticles = (await fillAuthorImages(spotlightArticlesRaw)) as ArticleWithRelations[];
       if (spotlightArticles.length > 0) {
         spotlightCategory = spotlightArticles[0].category;
       }
@@ -98,7 +107,7 @@ export default async function HomePage({
     <>
       <SiteHeader />
       <main className="flex-1 w-full">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-12 sm:space-y-16">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-6 sm:pt-7 pb-8 sm:pb-10 space-y-12 sm:space-y-16">
           {hero && (
             <section>
               <HeroFeature hero={hero} sideList={sideList} />
@@ -114,7 +123,7 @@ export default async function HomePage({
           <section>
             {isFrontPage && rest.length > 0 && (
               <div className="flex items-center justify-between mb-7">
-                <h2 className="font-display font-extrabold text-2xl text-gray-900 dark:text-gray-50">
+                <h2 className="font-display font-medium tracking-tight text-2xl sm:text-[2rem] text-gray-900 dark:text-gray-50">
                   Latest Articles
                 </h2>
                 {totalPages > 1 && (
@@ -133,7 +142,7 @@ export default async function HomePage({
           {spotlightCategory && spotlightArticles.length > 0 && (
             <section>
               <div className="flex items-center justify-between mb-7">
-                <h2 className="font-display font-extrabold text-2xl text-gray-900 dark:text-gray-50">
+                <h2 className="font-display font-medium tracking-tight text-2xl sm:text-[2rem] text-gray-900 dark:text-gray-50">
                   {spotlightCategory.name} News
                 </h2>
                 <Link

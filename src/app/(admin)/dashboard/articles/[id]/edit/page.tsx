@@ -19,7 +19,7 @@ export default async function EditArticlePage({ params }: { params: { id: string
 
   return (
     <div>
-      <h1 className="font-serif text-2xl font-bold mb-6">Edit Article</h1>
+      <h1 className="font-display font-medium tracking-tight text-2xl mb-6">Edit Article</h1>
       <ArticleForm article={article as ArticleWithRelations} categories={categories} />
     </div>
   );

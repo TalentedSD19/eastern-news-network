@@ -26,13 +26,13 @@ export default function FeatureDuo({ articles }: { articles: ArticleWithRelation
             ) : null}
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-              <div className="flex items-center gap-2 text-[0.7rem] mb-2">
-                <span className="font-bold tracking-wide uppercase text-brand-accent">{article.category.name}</span>
+              <div className="flex items-center gap-2 text-[13px] mb-2">
+                <span className="text-brand-accent">{article.category.name}</span>
               </div>
-              <h3 className="font-display font-extrabold text-lg sm:text-xl leading-snug text-white line-clamp-2 mb-2">
+              <h3 className="font-display font-medium tracking-tight text-lg sm:text-[1.375rem] leading-snug text-white line-clamp-2 mb-2">
                 {article.title}
               </h3>
-              <p className="text-xs text-white/70">{byline}</p>
+              <p className="text-[13px] text-white/70">{byline}</p>
             </div>
           </Link>
         );

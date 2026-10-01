@@ -54,7 +54,7 @@ function formatSeconds(total: number): string {
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm p-6">
-      <h2 className="font-serif text-lg font-semibold">{title}</h2>
+      <h2 className="font-display font-medium tracking-tight text-lg">{title}</h2>
       {subtitle && <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">{subtitle}</p>}
       {!subtitle && <div className="mb-3" />}
       {children}
@@ -117,7 +117,7 @@ export default async function MetricsPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="font-serif text-2xl font-bold">Metrics</h1>
+        <h1 className="font-display font-medium tracking-tight text-2xl">Metrics</h1>
         <div className="flex items-center gap-3 flex-wrap">
           <AuthorFilterSelect authors={authorList} activeAuthor={activeAuthor} />
           <div className="flex items-center gap-1.5">
@@ -133,7 +133,7 @@ export default async function MetricsPage({
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
                     activeValue === r.value
-                      ? "bg-brand-red text-white"
+                      ? "bg-brand-accent text-white"
                       : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10"
                   )}
                 >
@@ -218,7 +218,7 @@ export default async function MetricsPage({
 
       {/* Top articles */}
       <div>
-        <h2 className="font-serif text-lg font-semibold mb-3">Top articles</h2>
+        <h2 className="font-display font-medium tracking-tight text-lg mb-3">Top articles</h2>
         <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm overflow-hidden">
           <Table>
             <TableHeader>

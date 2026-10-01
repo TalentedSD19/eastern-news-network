@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
 
+// Without this Next prerenders the route at build time, freezing the list —
+// and Google News only reads articles from the last 48 hours.
+export const revalidate = 300;
+
 const BASE_URL = "https://easternnewsnetwork.com";
 const PUBLICATION_NAME = "Eastern News Network";
 

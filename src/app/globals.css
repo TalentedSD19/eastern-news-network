@@ -39,7 +39,7 @@
   }
 
   .dark {
-    --background: 0 0% 7%;
+    --background: 0 0% 10%;
     --foreground: 0 0% 96%;
     --primary: 0 0% 96%;
     --primary-foreground: 0 0% 9%;
@@ -54,9 +54,9 @@
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 0 0% 80%;
-    --card: 0 0% 10%;
+    --card: 0 0% 13%;
     --card-foreground: 0 0% 96%;
-    --popover: 0 0% 10%;
+    --popover: 0 0% 13%;
     --popover-foreground: 0 0% 96%;
 
     /* Chart tokens (dataviz skill — validated sequential blue, dark-band step) */

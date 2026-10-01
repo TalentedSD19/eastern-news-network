@@ -51,12 +51,12 @@ export default async function ArticlesListPage({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="font-serif text-2xl font-bold">Articles</h1>
+        <h1 className="font-display font-medium tracking-tight text-2xl">Articles</h1>
         <div className="flex flex-wrap items-center gap-3">
           <ArticleSearchInput />
           <Link
             href="/dashboard/articles/new"
-            className={cn(buttonVariants(), "bg-brand-red hover:bg-brand-red/90 text-white")}
+            className={cn(buttonVariants(), "bg-brand-accent hover:bg-brand-accent-dark text-white")}
           >
             New Article
           </Link>

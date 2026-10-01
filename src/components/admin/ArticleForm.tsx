@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import ArticleImageManager, { type ArticleImage } from "./ArticleImageManager";
 import ArticleBody from "@/components/public/ArticleBody";
 import { slugify, formatDateTimeIST } from "@/lib/utils";
@@ -180,7 +179,7 @@ export default function ArticleForm({ article, categories }: Props) {
           onClick={() => setMode("edit")}
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             mode === "edit"
-              ? "border-brand-red text-brand-red"
+              ? "border-brand-accent text-brand-accent"
               : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           }`}
         >
@@ -191,7 +190,7 @@ export default function ArticleForm({ article, categories }: Props) {
           onClick={() => setMode("preview")}
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
             mode === "preview"
-              ? "border-brand-red text-brand-red"
+              ? "border-brand-accent text-brand-accent"
               : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
           }`}
         >
@@ -219,23 +218,23 @@ export default function ArticleForm({ article, categories }: Props) {
           </p>
 
           <article className="py-4">
-            <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <div className="flex items-center gap-3 mb-5 flex-wrap">
               {isBreaking && (
-                <span className="bg-brand-red text-white text-[11px] font-black px-2 py-0.5 rounded tracking-widest uppercase animate-pulse">
+                <span className="bg-brand-accent text-white text-[10px] font-semibold px-2.5 py-1 rounded-sm tracking-[0.08em] uppercase animate-pulse">
                   Breaking
                 </span>
               )}
               {selectedCategory && (
-                <Badge className="bg-brand-red text-white">{selectedCategory.name}</Badge>
+                <span className="text-brand-accent text-sm">{selectedCategory.name}</span>
               )}
             </div>
 
-            <h1 className="font-serif text-4xl font-bold leading-tight mb-2">
+            <h1 className="font-display font-medium tracking-tight text-[2rem] sm:text-4xl lg:text-[2.75rem] leading-[1.15] text-gray-950 dark:text-gray-50 mb-4">
               {title || <span className="text-gray-300 dark:text-gray-600">Article title will appear here</span>}
             </h1>
 
             {subtitle && (
-              <p className="font-serif text-xl text-gray-500 dark:text-gray-400 mb-4 leading-snug">{subtitle}</p>
+              <p className="font-sans text-xl text-gray-500 dark:text-gray-400 leading-relaxed mb-6">{subtitle}</p>
             )}
 
             <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
@@ -469,7 +468,7 @@ export default function ArticleForm({ article, categories }: Props) {
             type="checkbox"
             checked={isBreaking}
             onChange={(e) => setIsBreaking(e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-brand-red cursor-pointer"
+            className="mt-0.5 h-4 w-4 accent-brand-accent cursor-pointer"
           />
           <div>
             <label htmlFor="isBreaking" className="text-sm font-medium cursor-pointer select-none">
@@ -477,7 +476,7 @@ export default function ArticleForm({ article, categories }: Props) {
             </label>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               Shows a prominent{" "}
-              <span className="bg-brand-red text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+              <span className="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                 BREAKING
               </span>{" "}
               badge on the article page.
@@ -553,7 +552,7 @@ export default function ArticleForm({ article, categories }: Props) {
             <div className="space-y-1">
               <button
                 type="button"
-                className="text-sm text-brand-red hover:underline disabled:opacity-50"
+                className="text-sm text-brand-accent hover:underline disabled:opacity-50"
                 disabled={authorImageUploading}
                 onClick={() => authorImageRef.current?.click()}
               >
@@ -609,7 +608,7 @@ export default function ArticleForm({ article, categories }: Props) {
           <Button
             type="submit"
             disabled={saving}
-            className="bg-brand-red hover:bg-brand-red/90 text-white"
+            className="bg-brand-accent hover:bg-brand-accent-dark text-white"
           >
             {saving ? "Saving…" : article ? "Update Article" : "Create Article"}
           </Button>

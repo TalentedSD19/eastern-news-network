@@ -6,7 +6,7 @@ export function HeaderSkeleton() {
       <div className="bg-brand-dark dark:bg-black">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 h-16 sm:h-[4.5rem] flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <span className="font-display font-extrabold text-[0.95rem] sm:text-lg md:text-xl text-white tracking-tight leading-none">
+            <span className="font-display font-semibold text-[0.95rem] sm:text-lg md:text-xl text-white tracking-tight leading-none">
               Eastern News Network
             </span>
           </Link>
@@ -49,7 +49,7 @@ export function FooterSkeleton() {
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
         <div className="flex flex-col lg:flex-row gap-10 lg:justify-between">
           <div className="max-w-xs">
-            <p className="font-display font-extrabold text-white text-2xl tracking-tight">Eastern News Network</p>
+            <p className="font-display font-semibold text-white text-2xl tracking-tight">Eastern News Network</p>
             <p className="text-xs tracking-[0.2em] uppercase text-gray-500 mt-1.5">From the East, To the World</p>
           </div>
           <nav className="flex gap-6 text-sm">

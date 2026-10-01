@@ -43,7 +43,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
         <Link href="/dashboard/articles" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
           ← Back to Articles
         </Link>
-        <h1 className="font-serif text-2xl font-bold mt-2 line-clamp-2">{article.title}</h1>
+        <h1 className="font-display font-medium tracking-tight text-2xl mt-2 line-clamp-2">{article.title}</h1>
       </div>
 
       {/* Stat cards */}
@@ -56,7 +56,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
 
       {/* Geo breakdown */}
       <div>
-        <h2 className="font-serif text-lg font-semibold mb-3">Views by Location</h2>
+        <h2 className="font-display font-medium tracking-tight text-lg mb-3">Views by Location</h2>
         <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
@@ -88,7 +88,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
 
       {/* Comments */}
       <div>
-        <h2 className="font-serif text-lg font-semibold mb-3">Comments</h2>
+        <h2 className="font-display font-medium tracking-tight text-lg mb-3">Comments</h2>
         <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm overflow-hidden">
           <Table>
             <TableHeader>

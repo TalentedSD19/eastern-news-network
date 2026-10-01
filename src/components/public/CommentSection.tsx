@@ -42,10 +42,10 @@ export default function CommentSection({ articleId }: { articleId: string }) {
 
   return (
     <section className="mt-4 border-t border-gray-200 dark:border-white/10 pt-10">
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">
         Discussion
       </p>
-      <h2 className="font-display font-extrabold text-2xl text-gray-900 dark:text-gray-50 mb-8">
+      <h2 className="font-display font-medium tracking-tight text-2xl text-gray-900 dark:text-gray-50 mb-8">
         Reader Comments
         {comments.length > 0 && (
           <span className="ml-2 text-base font-normal text-gray-400 dark:text-gray-500">({comments.length})</span>

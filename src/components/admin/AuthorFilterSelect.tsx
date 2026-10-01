@@ -27,7 +27,7 @@ export default function AuthorFilterSelect({ authors, activeAuthor }: Props) {
     <select
       value={activeAuthor ?? ""}
       onChange={handleChange}
-      className="h-8 rounded-full border border-gray-200 dark:border-white/15 bg-white dark:bg-neutral-900 px-3 text-xs font-semibold text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-brand-red"
+      className="h-8 rounded-full border border-gray-200 dark:border-white/15 bg-white dark:bg-neutral-900 px-3 text-xs font-semibold text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-brand-accent"
     >
       <option value="">All authors</option>
       {authors.map((name) => (

@@ -95,7 +95,7 @@ export default function CropModal({ src, onDone, onClose }: Props) {
               size="sm"
               disabled={applying || !completed}
               onClick={handleApply}
-              className="bg-brand-red hover:bg-brand-red/90 text-white"
+              className="bg-brand-accent hover:bg-brand-accent-dark text-white"
             >
               {applying ? "Applying…" : "Apply Crop"}
             </Button>

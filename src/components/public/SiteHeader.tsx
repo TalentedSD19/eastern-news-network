@@ -24,7 +24,7 @@ export default async function SiteHeader() {
               priority
             />
             <div className="flex flex-col items-start min-w-0 leading-none">
-              <span className="font-display font-extrabold text-[0.95rem] sm:text-lg md:text-xl text-white tracking-tight leading-none truncate max-w-full group-hover:text-brand-accent transition-colors duration-200">
+              <span className="font-display font-semibold text-[0.95rem] sm:text-lg md:text-xl text-white tracking-tight leading-none truncate max-w-full group-hover:text-brand-accent transition-colors duration-200">
                 Eastern News Network
               </span>
               <span className="text-[0.55rem] sm:text-[0.6rem] tracking-[0.2em] text-gray-400 uppercase mt-1 font-sans truncate max-w-full">

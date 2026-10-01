@@ -13,11 +13,11 @@ export default function AboutPage() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 bg-white dark:bg-neutral-950">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-10 pb-16">
+      <main className="flex-1 bg-white dark:bg-background">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-7 pb-16">
 
           {/* Page heading */}
-          <h1 className="text-2xl font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-5">
+          <h1 className="text-2xl font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-5">
             About
           </h1>
           <div className="w-10 h-0.5 bg-brand-accent mb-8" />
@@ -36,13 +36,13 @@ export default function AboutPage() {
           </p>
 
           {/* Background section */}
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-4">
             Background
           </p>
           <div className="w-6 h-0.5 bg-brand-accent mb-8" />
 
           {/* Narrative — uses the same prose class as ArticleBody */}
-          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-extrabold prose-a:text-brand-accent prose-strong:font-normal prose-em:not-italic mb-14">
+          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-brand-accent prose-strong:font-normal prose-em:not-italic mb-14">
             <p>
               I remember the exact moment the idea first took hold — sitting in a dimly lit room,
               scrolling through headlines that felt distant, disconnected.
@@ -98,7 +98,7 @@ export default function AboutPage() {
 
           {/* Statutory caution — same card style as "About the Author" on article pages */}
           <div className="rounded-sm border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-6 py-5 mb-12">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-2">
+            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">
               Statutory Caution
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -123,8 +123,8 @@ export default function AboutPage() {
 
             {/* Name + contact */}
             <div>
-              <p className="font-display font-extrabold text-2xl text-gray-950 dark:text-gray-50 mb-0.5">Prasanta Paul</p>
-              <p className="text-[11px] font-black uppercase tracking-[0.15em] text-brand-accent mb-3">
+              <p className="font-display font-medium tracking-tight text-2xl text-gray-950 dark:text-gray-50 mb-0.5">Prasanta Paul</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-accent mb-3">
                 Editor, India
               </p>
               <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">

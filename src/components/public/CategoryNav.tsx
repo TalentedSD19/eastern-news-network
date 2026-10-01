@@ -39,7 +39,7 @@ export default function CategoryNav({ categories }: { categories: Category[] }) 
 
   const linkClass = (active: boolean) =>
     cn(
-      "px-3 py-3 text-[0.78rem] font-sans font-semibold uppercase whitespace-nowrap border-b-2 transition-colors duration-150 tracking-wide",
+      "px-3 py-3 text-sm font-sans font-medium whitespace-nowrap border-b-2 transition-colors duration-150",
       active
         ? "border-brand-accent text-brand-accent"
         : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:border-gray-600"

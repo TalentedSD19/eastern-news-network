@@ -34,7 +34,7 @@ export default function ArticleBody({ html }: { html: string }) {
   const clean = sanitizeHtml(html, ALLOWED);
   return (
     <div
-      className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-extrabold prose-a:text-brand-accent"
+      className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-brand-accent"
       dangerouslySetInnerHTML={{ __html: clean }}
     />
   );

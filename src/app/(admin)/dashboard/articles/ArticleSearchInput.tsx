@@ -44,7 +44,7 @@ export default function ArticleSearchInput() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search articles…"
-        className="w-full h-9 rounded-full border border-gray-200 dark:border-white/15 bg-white dark:bg-neutral-900 pl-9 pr-3 text-sm text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-red"
+        className="w-full h-9 rounded-full border border-gray-200 dark:border-white/15 bg-white dark:bg-neutral-900 pl-9 pr-3 text-sm text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-accent"
       />
     </div>
   );

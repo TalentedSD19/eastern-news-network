@@ -29,7 +29,7 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
 
       {/* Content */}
       <div className="pt-3">
-        <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 mb-1.5">
+        <div className="flex items-center gap-1.5 text-[13px] text-gray-400 dark:text-gray-500 mb-2">
           <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center text-[0.6rem] font-bold text-gray-500 dark:text-gray-400 shrink-0 overflow-hidden">
             {article.authorImage ? (
               <Image src={article.authorImage} alt={byline} width={20} height={20} className="w-full h-full object-cover" />
@@ -39,13 +39,13 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
           </div>
           <span className="font-medium text-gray-600 dark:text-gray-300">{byline}</span>
         </div>
-        <h2 className="font-display font-extrabold text-[1.05rem] leading-snug mb-1.5 line-clamp-2 text-gray-900 dark:text-gray-50 group-hover:text-brand-accent transition-colors duration-150">
+        <h2 className="font-display font-medium tracking-tight text-[1.0625rem] leading-snug mb-2 line-clamp-2 text-gray-900 dark:text-gray-50 group-hover:text-brand-accent transition-colors duration-150">
           {article.title}
         </h2>
-        <div className="flex items-center gap-1.5 text-[0.68rem]">
-          <span className="font-bold tracking-wide uppercase text-brand-accent">{article.category.name}</span>
-          <span className="text-gray-300 dark:text-gray-600">·</span>
-          <span className="text-gray-400 dark:text-gray-500 font-semibold">{mins} min read</span>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-brand-accent">{article.category.name}</span>
+          <span className="text-gray-300 dark:text-gray-600">|</span>
+          <span className="text-gray-400 dark:text-gray-500">{mins} min read</span>
         </div>
       </div>
     </Link>

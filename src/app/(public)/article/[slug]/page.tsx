@@ -12,10 +12,12 @@ import VoteBar from "@/components/public/VoteBar";
 import ShareBar from "@/components/public/ShareBar";
 import CommentSection from "@/components/public/CommentSection";
 import TweetEmbed from "@/components/public/TweetEmbed";
-import ArticleGrid from "@/components/public/ArticleGrid";
+import ArticleCard from "@/components/public/ArticleCard";
 import { formatDateTimeIST, readingTime, slugify } from "@/lib/utils";
 import { extractTweetId } from "@/lib/extractTweetId";
 import type { ArticleWithRelations } from "@/types";
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, baseOpenGraph, jsonLdScript } from "@/lib/seo";
+import { fillAuthorImages } from "@/lib/authorImages";
 
 export const dynamic = "force-dynamic";
 
@@ -43,8 +45,6 @@ function UserIcon() {
   );
 }
 
-const SITE_URL = "https://easternnewsnetwork.com";
-
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await prisma.article.findUnique({
     where: { slug: params.slug, status: "PUBLISHED" },
@@ -55,16 +55,20 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       seoKeywords: true,
       publishedAt: true,
       updatedAt: true,
+      reporterName: true,
       author: { select: { name: true } },
       category: { select: { name: true } },
     },
   });
-  if (!article) return {};
+  // Throwing here (not just in the page) sends a real 404: metadata resolves before
+  // the loading.tsx shell streams, after which the status is locked at 200.
+  if (!article) notFound();
 
   const url = `${SITE_URL}/article/${params.slug}`;
   const images = article.coverImage
     ? [{ url: article.coverImage, alt: article.title }]
-    : [];
+    : [DEFAULT_OG_IMAGE];
+  const byline = article.reporterName ?? article.author.name;
 
   return {
     title: article.title,
@@ -72,6 +76,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     keywords: article.seoKeywords ?? undefined,
     alternates: { canonical: url },
     openGraph: {
+      ...baseOpenGraph,
       type: "article",
       url,
       title: article.title,
@@ -79,14 +84,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       images,
       publishedTime: article.publishedAt?.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
-      authors: [article.author.name],
+      authors: [`${SITE_URL}/author/${slugify(byline)}`],
       section: article.category.name,
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description: article.excerpt,
-      images: article.coverImage ? [article.coverImage] : [],
+      images: [images[0].url],
     },
   };
 }
@@ -110,7 +115,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const initialUp = voteRows.find((r) => r.voteType === "UP")?._count.id ?? 0;
   const initialDown = voteRows.find((r) => r.voteType === "DOWN")?._count.id ?? 0;
 
-  const SIMILAR_LIMIT = 3;
+  const SIMILAR_LIMIT = 4;
   const similarArticles = await prisma.article.findMany({
     where: {
       status: "PUBLISHED",
@@ -157,13 +162,16 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     }
   }
 
+  // One lookup fills missing author photos for this article and the cards below.
+  const [withImage, ...similarWithImages] = await fillAuthorImages([article, ...similarArticles]);
+
   const tweetId = article.twitterUrl ? extractTweetId(article.twitterUrl) : null;
   const byline = article.reporterName ?? article.author.name;
   const isBreaking = article.isBreaking;
   const subtitle = article.subtitle;
   const dateline = article.dateline;
   const aboutAuthors = article.aboutAuthors;
-  const authorImage = article.authorImage;
+  const authorImage = withImage.authorImage;
   const mins = readingTime(article.body);
   const multipleAuthors = aboutAuthors?.includes("\n\n") ?? false;
 
@@ -174,6 +182,11 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     headline: article.title,
     description: article.excerpt,
     url: articleUrl,
+    inLanguage: "en-IN",
+    isAccessibleForFree: true,
+    articleSection: article.category.name,
+    keywords: article.seoKeywords ?? undefined,
+    wordCount: article.body.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length,
     datePublished: (article.publishedAt ?? article.createdAt).toISOString(),
     dateModified: article.updatedAt.toISOString(),
     author: {
@@ -182,53 +195,66 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       url: `${SITE_URL}/author/${slugify(byline)}`,
     },
     publisher: {
-      "@type": "Organization",
-      name: "Eastern News Network",
+      "@type": "NewsMediaOrganization",
+      name: SITE_NAME,
+      url: SITE_URL,
       logo: {
         "@type": "ImageObject",
         url: `${SITE_URL}/android-chrome-512x512.png`,
       },
     },
-    image: article.coverImage
-      ? { "@type": "ImageObject", url: article.coverImage }
-      : undefined,
+    image: article.coverImage ? [article.coverImage] : undefined,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": articleUrl,
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: article.category.name, item: `${SITE_URL}/category/${article.category.slug}` },
+      { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbJsonLd) }}
       />
       <SiteHeader />
       <ViewTracker articleId={article.id} />
 
-      <main className="flex-1 bg-white dark:bg-neutral-950">
+      <main className="flex-1 bg-white dark:bg-background">
 
         {/* ── Article header ── */}
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-10 pb-2">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-7 pb-2">
 
           {/* Category + Breaking */}
           <div className="flex items-center gap-3 mb-5">
             {isBreaking && (
-              <span className="bg-brand-accent text-white text-[10px] font-black px-2.5 py-1 rounded-sm tracking-[0.15em] uppercase animate-pulse">
+              <span className="bg-brand-accent text-white text-[10px] font-semibold px-2.5 py-1 rounded-sm tracking-[0.08em] uppercase animate-pulse">
                 Breaking
               </span>
             )}
             <Link
               href={`/category/${article.category.slug}`}
-              className="text-brand-accent text-[11px] font-black uppercase tracking-[0.15em] hover:underline underline-offset-2"
+              className="text-brand-accent text-sm hover:underline underline-offset-2"
             >
               {article.category.name}
             </Link>
           </div>
 
           {/* Headline */}
-          <h1 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] text-gray-950 dark:text-gray-50 mb-4">
+          <h1 className="font-display font-medium tracking-tight text-[2rem] sm:text-4xl lg:text-[2.75rem] leading-[1.15] text-gray-950 dark:text-gray-50 mb-4">
             {article.title}
           </h1>
 
@@ -249,7 +275,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 <UserIcon />
                 <Link
                   href={`/author/${slugify(byline)}`}
-                  className="font-semibold text-gray-800 dark:text-gray-200 hover:text-brand-accent transition-colors"
+                  className="font-medium text-gray-800 dark:text-gray-200 hover:text-brand-accent transition-colors"
                 >
                   By {byline}
                 </Link>
@@ -257,7 +283,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               {dateline && (
                 <>
                   <span className="text-gray-300 dark:text-gray-600 select-none">·</span>
-                  <span className="uppercase tracking-wide text-[11px] font-semibold text-gray-500 dark:text-gray-400">
+                  <span className="uppercase tracking-wide text-[11px] font-medium text-gray-500 dark:text-gray-400">
                     {dateline}
                   </span>
                 </>
@@ -313,17 +339,18 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           {/* About the Author(s) */}
           {aboutAuthors && (
             <div className="mt-12 mb-8 border-t-2 border-brand-accent pt-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500 mb-6 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-6 text-center">
                 About the {multipleAuthors ? "Authors" : "Author"}
               </p>
               <div className="flex flex-col items-center gap-4">
-                <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 shadow-sm flex-shrink-0">
-                  <Image
-                    src={authorImage ?? "/prasanta_profile_image.jpg"}
-                    alt={byline}
-                    fill
-                    className="object-cover"
-                  />
+                <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/10 shadow-sm flex-shrink-0 bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+                  {authorImage ? (
+                    <Image src={authorImage} alt={byline} fill className="object-cover" />
+                  ) : (
+                    <span className="font-display font-medium tracking-tight text-2xl text-gray-400 dark:text-gray-500">
+                      {byline.charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed text-justify max-w-xl">
                   {aboutAuthors}
@@ -341,12 +368,18 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <div className="border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.02]">
             <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-14">
               <div className="flex items-center gap-3 mb-8">
-                <h2 className="font-display font-extrabold text-2xl text-gray-900 dark:text-gray-50 whitespace-nowrap">
+                <h2 className="font-display font-medium tracking-tight text-2xl sm:text-[2rem] text-gray-900 dark:text-gray-50 whitespace-nowrap">
                   Similar Stories
                 </h2>
                 <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
               </div>
-              <ArticleGrid articles={similarArticles as ArticleWithRelations[]} />
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-9">
+                {(similarWithImages as ArticleWithRelations[]).map((a) => (
+                  <div key={a.id} className="w-full sm:w-[calc(50%-0.75rem)] xl:w-[calc(25%-1.125rem)]">
+                    <ArticleCard article={a} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
