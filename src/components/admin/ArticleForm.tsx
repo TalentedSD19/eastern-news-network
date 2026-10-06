@@ -73,6 +73,9 @@ export default function ArticleForm({ article, categories }: Props) {
   const [authorImageUploading, setAuthorImageUploading] = useState(false);
   const authorImageRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED">(article?.status ?? "DRAFT");
+  const [notify, setNotify] = useState(true);
+  // Subscribers are only notified the first time an article goes live.
+  const alreadyAnnounced = Boolean(article?.publishedAt);
 
   // ── UI state ─────────────────────────────────────────────────────────────
   const [saving, setSaving] = useState(false);
@@ -114,7 +117,7 @@ export default function ArticleForm({ article, categories }: Props) {
             title, slug, subtitle, dateline, isBreaking,
             reporterName, excerpt, body,
             coverImage: images[0]?.url ?? null, images,
-            categoryId, twitterUrl, seoKeywords, aboutAuthors, authorImage, status,
+            categoryId, twitterUrl, seoKeywords, aboutAuthors, authorImage, status, notify,
           }),
         });
         if (res.ok) {
@@ -133,7 +136,7 @@ export default function ArticleForm({ article, categories }: Props) {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, slug, subtitle, dateline, isBreaking, reporterName, seoKeywords,
-      excerpt, body, images, categoryId, twitterUrl, aboutAuthors, authorImage, status, article?.id]);
+      excerpt, body, images, categoryId, twitterUrl, aboutAuthors, authorImage, status, notify, article?.id]);
 
   // ── Submit ────────────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
@@ -146,7 +149,7 @@ export default function ArticleForm({ article, categories }: Props) {
       title, slug, subtitle, dateline, isBreaking,
       reporterName, excerpt, body,
       coverImage: images[0]?.url ?? null, images,
-      categoryId, twitterUrl, seoKeywords, aboutAuthors, authorImage, status,
+      categoryId, twitterUrl, seoKeywords, aboutAuthors, authorImage, status, notify,
     };
 
     const url = article ? `/api/articles/${article.id}` : "/api/articles";
@@ -602,6 +605,27 @@ export default function ArticleForm({ article, categories }: Props) {
             <option value="PUBLISHED">Published</option>
           </select>
         </div>
+
+        {/* Push notification on publish */}
+        {!alreadyAnnounced && (
+          <div className="flex items-start gap-3 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3">
+            <input
+              id="notify"
+              type="checkbox"
+              checked={notify}
+              onChange={(e) => setNotify(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-brand-accent cursor-pointer"
+            />
+            <div>
+              <label htmlFor="notify" className="text-sm font-medium cursor-pointer select-none">
+                Send browser notification when published
+              </label>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                Readers who turned on notifications get an alert the first time this article goes live.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3">

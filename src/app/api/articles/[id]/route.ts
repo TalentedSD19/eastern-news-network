@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+import { notifyNewArticle } from "@/lib/push";
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -13,6 +14,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     title, slug: slugInput, excerpt, body: content, coverImage, images,
     subtitle, dateline, isBreaking,
     categoryId, status, reporterName, twitterUrl, seoKeywords, aboutAuthors, authorImage,
+    notify,
   } = body;
   const resolvedCover = coverImage ?? (Array.isArray(images) && images[0]?.url ? images[0].url : undefined);
 
@@ -64,6 +66,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       category: { select: { id: true, name: true, slug: true } },
     },
   });
+
+  // Only the first transition to PUBLISHED notifies, so re-saving a live
+  // article (or unpublish → republish of an already-announced one) doesn't spam.
+  if (nowPublishing && !existing.publishedAt && notify !== false) {
+    await notifyNewArticle(article).catch((error) => console.error("Push notify failed", error));
+  }
 
   return NextResponse.json(article);
 }

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+import { notifyNewArticle } from "@/lib/push";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
     title, excerpt, body: content, coverImage, images,
     subtitle, dateline, isBreaking,
     categoryId, status, reporterName, twitterUrl, seoKeywords, aboutAuthors, authorImage,
+    notify,
   } = body;
 
   if (!title || !excerpt || !content || !categoryId) {
@@ -70,6 +72,10 @@ export async function POST(req: NextRequest) {
       category: { select: { id: true, name: true, slug: true } },
     },
   });
+
+  if (article.status === "PUBLISHED" && notify !== false) {
+    await notifyNewArticle(article).catch((error) => console.error("Push notify failed", error));
+  }
 
   return NextResponse.json(article, { status: 201 });
 }
