@@ -256,12 +256,68 @@ export async function getDeviceBreakdown(days: DayRange, authorFilter?: string):
     .sort((a, b) => b.value - a.value);
 }
 
+export interface DayCount {
+  date: string; // yyyy-mm-dd, UTC — same buckets as getViewsOverTime
+  views: number;
+}
+
+// Daily views for each article from its publish day to today (lifetime, not limited to any
+// period). Falls back to the first view for articles without a publish date; views logged
+// before publishing (previews) are left out.
+async function getLifetimeDailyViews(
+  articles: { id: string; publishedAt: Date | null }[]
+): Promise<Map<string, DayCount[]>> {
+  const series = new Map<string, DayCount[]>();
+  if (articles.length === 0) return series;
+
+  const rows = await prisma.$queryRaw<{ articleId: string; day: Date; views: bigint }[]>`
+    SELECT v."articleId", date_trunc('day', v."viewedAt") AS day, COUNT(*)::bigint AS views
+    FROM "ArticleView" v
+    WHERE v."articleId" IN (${Prisma.join(articles.map((a) => a.id))})
+    GROUP BY v."articleId", day
+  `;
+  const counts = new Map(rows.map((r) => [`${r.articleId}|${r.day.toISOString().slice(0, 10)}`, Number(r.views)]));
+  const firstViewDay = new Map<string, number>();
+  for (const r of rows) {
+    const t = r.day.getTime();
+    if (t < (firstViewDay.get(r.articleId) ?? Infinity)) firstViewDay.set(r.articleId, t);
+  }
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  for (const a of articles) {
+    const start = new Date(a.publishedAt?.getTime() ?? firstViewDay.get(a.id) ?? today.getTime());
+    start.setUTCHours(0, 0, 0, 0);
+    const days: DayCount[] = [];
+    for (const d = new Date(start); d <= today; d.setUTCDate(d.getUTCDate() + 1)) {
+      const date = d.toISOString().slice(0, 10);
+      days.push({ date, views: counts.get(`${a.id}|${date}`) ?? 0 });
+    }
+    series.set(a.id, days);
+  }
+  return series;
+}
+
+// One article's lifetime daily views, in the shape TrendAreaChart takes.
+export async function getArticleViewsSincePublish(article: { id: string; publishedAt: Date | null }): Promise<DailyViews[]> {
+  const days = (await getLifetimeDailyViews([article])).get(article.id) ?? [];
+  const views = days.map((d) => d.views);
+  return days.map((d, i) => ({
+    date: d.date,
+    views: d.views,
+    weightedAvg: Math.round(weightedMovingAverage(views, i) * 10) / 10,
+  }));
+}
+
 export interface TopArticle {
   id: string;
   title: string;
   slug: string;
   category: string;
-  views: number;
+  publishedAt: Date | null;
+  views: number; // within the selected period
+  daily: DayCount[]; // publish day → today, not limited to the period
 }
 
 export async function getTopArticles(days: DayRange, authorFilter?: string, limit = 10): Promise<TopArticle[]> {
@@ -277,9 +333,10 @@ export async function getTopArticles(days: DayRange, authorFilter?: string, limi
 
   const articles = await prisma.article.findMany({
     where: { id: { in: grouped.map((g) => g.articleId) } },
-    select: { id: true, title: true, slug: true, category: { select: { name: true } } },
+    select: { id: true, title: true, slug: true, publishedAt: true, category: { select: { name: true } } },
   });
   const byId = new Map(articles.map((a) => [a.id, a]));
+  const daily = await getLifetimeDailyViews(articles);
 
   return grouped
     .map((g) => {
@@ -290,7 +347,9 @@ export async function getTopArticles(days: DayRange, authorFilter?: string, limi
         title: article.title,
         slug: article.slug,
         category: article.category.name,
+        publishedAt: article.publishedAt,
         views: g._count.id,
+        daily: daily.get(article.id) ?? [],
       };
     })
     .filter((a): a is TopArticle => a !== null);

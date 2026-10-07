@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface Props {
@@ -11,7 +12,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 // dateStr is a plain "yyyy-mm-dd" UTC calendar bucket — parse it as text, never through
 // `new Date(dateStr)` + local formatting, which shifts the displayed day for any viewer
 // west of UTC (midnight UTC renders as the previous day's evening in their timezone).
-function formatDayLabel(dateStr: string, withYear = false): string {
+export function formatDayLabel(dateStr: string, withYear = false): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   return withYear ? `${d} ${MONTHS[m - 1]} ${y}` : `${d} ${MONTHS[m - 1]}`;
 }
@@ -52,6 +53,8 @@ function TrendTooltip({
 
 export default function TrendAreaChart({ data }: Props) {
   const tickInterval = data.length > 14 ? Math.ceil(data.length / 8) : 0;
+  // useId output contains ":" which breaks url(#…) references.
+  const gradientId = `trend-fill-${useId().replace(/:/g, "")}`;
 
   return (
     <div>
@@ -70,6 +73,12 @@ export default function TrendAreaChart({ data }: Props) {
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--chart-series)" stopOpacity={0.28} />
+              <stop offset="100%" stopColor="var(--chart-series)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
           <CartesianGrid stroke="var(--chart-gridline)" vertical={false} />
           <XAxis
             dataKey="date"
@@ -102,8 +111,8 @@ export default function TrendAreaChart({ data }: Props) {
             dataKey="views"
             stroke="var(--chart-series)"
             strokeWidth={2}
-            fill="var(--chart-series-fill)"
-            activeDot={{ r: 4, stroke: "var(--chart-series)", strokeWidth: 2, fill: "var(--chart-series)" }}
+            fill={`url(#${gradientId})`}
+            activeDot={{ r: 4, stroke: "hsl(var(--card))", strokeWidth: 2, fill: "var(--chart-series)" }}
           />
           <Line
             type="monotone"
