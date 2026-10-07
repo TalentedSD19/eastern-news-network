@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import MetricsStatCard from "@/components/admin/MetricsStatCard";
 import AuthorFilterSelect from "@/components/admin/AuthorFilterSelect";
 import TrendAreaChart from "@/components/admin/charts/TrendAreaChart";
 import RankedBarChart from "@/components/admin/charts/RankedBarChart";
+import ViewsSparkline from "@/components/admin/charts/ViewsSparkline";
 import {
   type DayRange,
   getOverallStats,
@@ -225,14 +226,16 @@ export default async function MetricsPage({
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead className="whitespace-nowrap">Published</TableHead>
                 <TableHead className="text-right">Views</TableHead>
+                <TableHead className="text-right hidden md:table-cell">Views since published</TableHead>
                 <TableHead className="text-right">Details</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {topArticles.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-gray-400 dark:text-gray-500 py-10">
+                  <TableCell colSpan={6} className="text-center text-gray-400 dark:text-gray-500 py-10">
                     No views recorded for this period yet.
                   </TableCell>
                 </TableRow>
@@ -241,7 +244,13 @@ export default async function MetricsPage({
                 <TableRow key={a.id}>
                   <TableCell className="font-medium max-w-xs truncate">{a.title}</TableCell>
                   <TableCell>{a.category}</TableCell>
+                  <TableCell className="whitespace-nowrap text-gray-500 dark:text-gray-400">
+                    {a.publishedAt ? formatDate(a.publishedAt) : "—"}
+                  </TableCell>
                   <TableCell className="text-right tabular-nums">{a.views.toLocaleString()}</TableCell>
+                  <TableCell className="text-right hidden md:table-cell py-1.5">
+                    <ViewsSparkline data={a.daily} />
+                  </TableCell>
                   <TableCell className="text-right">
                     <Link
                       href={`/dashboard/articles/${a.id}/metrics`}

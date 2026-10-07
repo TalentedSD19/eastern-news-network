@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import MetricsStatCard from "@/components/admin/MetricsStatCard";
+import TrendAreaChart from "@/components/admin/charts/TrendAreaChart";
+import { getArticleViewsSincePublish } from "@/lib/metrics";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export const dynamic = "force-dynamic";
@@ -10,11 +12,11 @@ export const dynamic = "force-dynamic";
 export default async function ArticleMetricsPage({ params }: { params: { id: string } }) {
   const article = await prisma.article.findUnique({
     where: { id: params.id },
-    select: { title: true },
+    select: { id: true, title: true, publishedAt: true },
   });
   if (!article) notFound();
 
-  const [totalViews, geoRows, voteRows, comments] = await Promise.all([
+  const [totalViews, geoRows, voteRows, comments, viewsOverTime] = await Promise.all([
     prisma.articleView.count({ where: { articleId: params.id } }),
     prisma.articleView.groupBy({
       by: ["country", "region"],
@@ -32,6 +34,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
       where: { articleId: params.id },
       orderBy: { createdAt: "desc" },
     }),
+    getArticleViewsSincePublish(article),
   ]);
 
   const upvotes = voteRows.find((r) => r.voteType === "UP")?._count.id ?? 0;
@@ -44,6 +47,9 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
           ← Back to Articles
         </Link>
         <h1 className="font-display font-medium tracking-tight text-2xl mt-2 line-clamp-2">{article.title}</h1>
+        {article.publishedAt && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Published {formatDate(article.publishedAt)}</p>
+        )}
       </div>
 
       {/* Stat cards */}
@@ -52,6 +58,13 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
         <MetricsStatCard label="Upvotes" value={upvotes} />
         <MetricsStatCard label="Downvotes" value={downvotes} />
         <MetricsStatCard label="Comments" value={comments.length} />
+      </div>
+
+      {/* Views since published */}
+      <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm p-6">
+        <h2 className="font-display font-medium tracking-tight text-lg">Views since published</h2>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">Daily views from the day it went live to today</p>
+        <TrendAreaChart data={viewsOverTime} />
       </div>
 
       {/* Geo breakdown */}
