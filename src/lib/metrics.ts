@@ -231,6 +231,8 @@ export async function getViewsByCategory(days: DayRange, authorFilter?: string):
 
 // Stored as ArticleView.referrerHost when a reader came from another page on this site.
 export const INTERNAL_REFERRER = "internal";
+// Stored as ArticleView.referrerHost when the reader tapped a news alert (push notification).
+export const PUSH_REFERRER = "push";
 
 const OWN_SITE_HOSTS = /(^|\.)easternnewsnetwork\.com$|^localhost$|^127\.0\.0\.1$/;
 
@@ -258,6 +260,7 @@ const REFERRER_RULES: [RegExp, string][] = [
 function bucketReferrer(host: string | null): { label: string; sublabel?: string } | null {
   if (!host) return { label: "Direct", sublabel: "typed address, bookmark or a link in an app" };
   if (host === INTERNAL_REFERRER) return { label: "ENN pages", sublabel: "homepage or another article" };
+  if (host === PUSH_REFERRER) return { label: "News alerts", sublabel: "tapped a push notification" };
   const lower = host.toLowerCase();
   // Older views stored the article's own host (the tracker request's Referer), so the real source is unknown.
   if (isOwnSiteHost(lower)) return null;

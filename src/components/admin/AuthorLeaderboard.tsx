@@ -1,16 +1,11 @@
-import Link from "next/link";
+import { ExternalLink } from "lucide-react";
+import { slugify } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { AuthorStats } from "@/lib/metrics";
 
-interface Props {
-  authors: AuthorStats[];
-  /** Builds the link that filters the whole page to one author. */
-  authorHref: (byline: string) => string;
-}
-
-export default function AuthorLeaderboard({ authors, authorHref }: Props) {
+export default function AuthorLeaderboard({ authors }: { authors: AuthorStats[] }) {
   if (authors.length === 0) {
-    return <p className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">No activity in this period yet.</p>;
+    return <p className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">Nobody published in this period.</p>;
   }
   const maxViews = Math.max(1, ...authors.map((a) => a.views));
 
@@ -39,13 +34,17 @@ export default function AuthorLeaderboard({ authors, authorHref }: Props) {
           <TableRow key={a.byline}>
             {/* w-full + max-w-0 lets this column take the leftover width and truncate inside it */}
             <TableCell className="pl-5 w-full max-w-0">
-              <Link
-                href={authorHref(a.byline)}
-                title={`Show metrics for ${a.byline} only`}
-                className="block font-medium truncate hover:text-brand-accent transition-colors"
+              {/* The public author page (same slug as the byline links on articles), with their articles listed */}
+              <a
+                href={`/author/${slugify(a.byline)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Open ${a.byline}'s author page`}
+                className="group inline-flex max-w-full items-center gap-1.5 font-medium hover:text-brand-accent transition-colors"
               >
-                {a.byline}
-              </Link>
+                <span className="truncate">{a.byline}</span>
+                <ExternalLink className="size-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </a>
               <div className="mt-1 h-1 max-w-[12rem] rounded-full bg-gray-100 dark:bg-white/[0.06] overflow-hidden">
                 <div className="h-full rounded-full bg-brand-accent/60" style={{ width: `${Math.max(2, (a.views / maxViews) * 100)}%` }} />
               </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { classifyDevice } from "@/lib/device";
-import { INTERNAL_REFERRER, isOwnSiteHost } from "@/lib/metrics";
+import { INTERNAL_REFERRER, PUSH_REFERRER, isOwnSiteHost } from "@/lib/metrics";
 
 const VISITOR_COOKIE = "enn_vid";
 
@@ -58,8 +58,9 @@ export async function POST(
     if (ip !== "127.0.0.1") geo = await getGeoFromIp(ip);
   }
 
-  const body = (await request.json().catch(() => null)) as { referrer?: unknown } | null;
-  const referrerHost = getReferrerHost(body?.referrer, request.nextUrl.hostname);
+  const body = (await request.json().catch(() => null)) as { referrer?: unknown; source?: unknown } | null;
+  const referrerHost =
+    body?.source === "push" ? PUSH_REFERRER : getReferrerHost(body?.referrer, request.nextUrl.hostname);
   const userAgent = request.headers.get("user-agent");
   const deviceType = userAgent ? classifyDevice(userAgent) : null;
 

@@ -6,8 +6,9 @@ import SearchBar from "./SearchBar";
 import MobileMenu from "./MobileMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import NotificationPrompt from "./NotificationPrompt";
+import NotificationBell from "./NotificationBell";
 
-// `preview` drops the notification prompt when the header is shown inside the editor preview.
+// `preview` drops the notification prompt and bell when the header is shown inside the editor preview.
 export default async function SiteHeader({ preview = false }: { preview?: boolean }) {
   const categories = await prisma.category.findMany({ orderBy: { name: "asc" } }).catch(() => []);
 
@@ -37,6 +38,9 @@ export default async function SiteHeader({ preview = false }: { preview?: boolea
           </Link>
 
           <div className="flex-1" />
+
+          {/* News alerts on/off — shown on every screen size */}
+          {!preview && <NotificationBell />}
 
           {/* Search + theme toggle — desktop */}
           <div className="hidden sm:flex items-center gap-2">

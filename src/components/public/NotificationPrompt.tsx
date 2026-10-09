@@ -3,57 +3,26 @@
 import { useEffect, useState } from "react";
 import { Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  PUSH_CHANGE_EVENT,
+  hasAnswered,
+  isPushSupported,
+  isSnoozed,
+  requestAndSubscribe,
+  snooze,
+  subscribe,
+} from "@/lib/pushClient";
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+// Ask once the reader is engaged — scrolled part way down or stayed a while —
+// rather than the moment they land, the way most news sites time this alert.
+const MIN_DELAY_MS = 3000;
+const MAX_DELAY_MS = 10_000;
+const ENGAGED_SCROLL_PCT = 30;
 
-// Give the page a moment to load before the alert slides in.
-const PROMPT_DELAY_MS = 3000;
-// After "Not now", stay quiet for a week.
-const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000;
-const SNOOZE_KEY = "enn-push-snoozed-until";
-
-// PushManager wants the VAPID key as raw bytes, not base64url.
-function urlBase64ToUint8Array(base64: string) {
-  const padded = (base64 + "=".repeat((4 - (base64.length % 4)) % 4))
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-  const raw = atob(padded);
-  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
-}
-
-async function subscribe() {
-  const reg = await navigator.serviceWorker.register("/sw.js");
-  await navigator.serviceWorker.ready;
-  const sub =
-    (await reg.pushManager.getSubscription()) ??
-    (await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
-    }));
-
-  // Upsert every visit so the server re-learns a subscription it pruned or lost.
-  const res = await fetch("/api/push/subscribe", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(sub.toJSON()),
-  });
-  if (!res.ok) throw new Error(`Subscribe request failed: ${res.status}`);
-}
-
-function isSnoozed() {
-  try {
-    return Number(localStorage.getItem(SNOOZE_KEY) ?? 0) > Date.now();
-  } catch {
-    return false;
-  }
-}
-
-function snooze() {
-  try {
-    localStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_MS));
-  } catch {
-    // Storage blocked: the alert just comes back next visit.
-  }
+function scrollPct(): number {
+  const doc = document.documentElement;
+  const scrollable = doc.scrollHeight - doc.clientHeight;
+  return scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
 }
 
 // Shows an in-page alert asking readers to turn on new-article notifications.
@@ -65,32 +34,46 @@ export default function NotificationPrompt() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (
-      !VAPID_PUBLIC_KEY ||
-      !window.isSecureContext ||
-      !("serviceWorker" in navigator) ||
-      !("PushManager" in window) ||
-      !("Notification" in window)
-    ) {
-      return;
-    }
+    if (!isPushSupported()) return;
 
     if (Notification.permission === "granted") {
       subscribe().catch((error) => console.error("Push subscribe failed", error));
       return;
     }
-    if (Notification.permission !== "default" || isSnoozed()) return;
+    if (Notification.permission !== "default" || hasAnswered() || isSnoozed()) return;
 
-    const timer = setTimeout(() => setOpen(true), PROMPT_DELAY_MS);
-    return () => clearTimeout(timer);
+    const loadedAt = Date.now();
+    const show = () => setOpen(true);
+    let timer = setTimeout(show, MAX_DELAY_MS);
+    // Scrolling far enough brings the alert forward — but never sooner than MIN_DELAY_MS.
+    function handleScroll() {
+      if (scrollPct() < ENGAGED_SCROLL_PCT) return;
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(timer);
+      timer = setTimeout(show, Math.max(0, MIN_DELAY_MS - (Date.now() - loadedAt)));
+    }
+    // Turning alerts on from the header bell answers the question too.
+    function handleChange() {
+      setOpen(false);
+      clearTimeout(timer);
+      window.removeEventListener("scroll", handleScroll);
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener(PUSH_CHANGE_EVENT, handleChange);
+    // The reader may already have scrolled before this hydrated.
+    handleScroll();
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener(PUSH_CHANGE_EVENT, handleChange);
+    };
   }, []);
 
   async function handleAllow() {
     setBusy(true);
     try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") await subscribe();
-      else if (permission === "default") snooze();
+      await requestAndSubscribe();
     } catch (error) {
       console.error("Push subscribe failed", error);
     } finally {
@@ -108,7 +91,7 @@ export default function NotificationPrompt() {
 
   return (
     <div
-      role="alertdialog"
+      role="dialog"
       aria-labelledby="push-prompt-title"
       aria-describedby="push-prompt-body"
       className="fixed inset-x-4 bottom-4 z-[60] mx-auto max-w-md rounded-xl border border-gray-200 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-neutral-900 sm:inset-x-auto sm:right-6 sm:bottom-6"
@@ -130,7 +113,8 @@ export default function NotificationPrompt() {
             Get breaking news alerts
           </p>
           <p id="push-prompt-body" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Allow notifications and we&apos;ll let you know as soon as a new story is published.
+            Allow notifications and we&apos;ll let you know as soon as a new story is published. You can turn them off
+            any time from the bell at the top of the page.
           </p>
           <div className="mt-3 flex gap-2">
             <Button

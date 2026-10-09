@@ -183,13 +183,6 @@ export default async function MetricsPage({
     return qs ? `/dashboard/metrics?${qs}` : "/dashboard/metrics";
   }
 
-  function authorHref(byline: string) {
-    const params = new URLSearchParams();
-    if (activeValue !== DEFAULT_RANGE) params.set("days", activeValue);
-    params.set("author", byline);
-    return `/dashboard/metrics?${params.toString()}`;
-  }
-
   return (
     <div className="space-y-8">
       {/* Header + filters */}
@@ -466,9 +459,9 @@ export default async function MetricsPage({
       {/* Authors — hidden when the page is already filtered to one */}
       {!activeAuthor && (
         <section>
-          <SectionHeading title="Authors" description={`Who drew readers ${activeRange.label.toLowerCase()} · click a name to see only their stories`} />
+          <SectionHeading title="Authors" description={`Authors who published ${activeRange.label.toLowerCase()} · click a name to open their author page`} />
           <div className="bg-white dark:bg-neutral-900 border border-transparent dark:border-white/10 rounded-lg shadow-sm overflow-hidden">
-            <AuthorLeaderboard authors={authors} authorHref={authorHref} />
+            <AuthorLeaderboard authors={authors.filter((a) => a.published > 0)} />
           </div>
         </section>
       )}
@@ -476,42 +469,38 @@ export default async function MetricsPage({
       {/* Audience */}
       <section>
         <SectionHeading title="Where readers come from" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-          <div className="grid gap-4">
-            <MetricsPanel
-              title="How they found us"
-              subtitle="The site or app a reader came from"
-              icon={Signpost}
-              insight={
-                topSource && totalReferred > 0 ? (
-                  <>
-                    <strong className="font-semibold">{topSource.label}</strong> brought in{" "}
-                    {pct(topSource.value, totalReferred)}% of views.
-                  </>
-                ) : undefined
-              }
-            >
-              <RankedList data={referrers.sources} emptyMessage="No sources recorded for this period yet." />
-              {referrers.untracked > 0 && (
-                <p className="mt-4 pt-3 border-t border-gray-100 dark:border-white/10 text-xs text-gray-500 dark:text-gray-400">
-                  {referrers.untracked.toLocaleString()} older {referrers.untracked === 1 ? "view was" : "views were"}{" "}
-                  recorded before sources were tracked, so {referrers.untracked === 1 ? "it isn't" : "they aren't"} counted here.
-                </p>
-              )}
-            </MetricsPanel>
-            <MetricsPanel title="Devices" subtitle="What people read on" icon={Smartphone}>
-              <DeviceSplit data={devices} />
-            </MetricsPanel>
-          </div>
-          <div className="grid gap-4">
-            <MetricsPanel title="Countries" subtitle="Top countries by views" icon={Globe}>
-              <RankedList data={viewsByCountry} showShare={false} limit={6} />
-            </MetricsPanel>
-            <MetricsPanel title="States and regions" subtitle="Top regions by views" icon={MapPin}>
-              <RankedList data={viewsByRegion} showShare={false} limit={8} emptyMessage="No region data for this period yet." />
-            </MetricsPanel>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <MetricsPanel
+            title="How they found us"
+            subtitle="The site or app a reader came from"
+            icon={Signpost}
+            insight={
+              topSource && totalReferred > 0 ? (
+                <>
+                  <strong className="font-semibold">{topSource.label}</strong> brought in{" "}
+                  {pct(topSource.value, totalReferred)}% of views.
+                </>
+              ) : undefined
+            }
+          >
+            <RankedList data={referrers.sources} emptyMessage="No sources recorded for this period yet." />
+            {referrers.untracked > 0 && (
+              <p className="mt-4 pt-3 border-t border-gray-100 dark:border-white/10 text-xs text-gray-500 dark:text-gray-400">
+                {referrers.untracked.toLocaleString()} older {referrers.untracked === 1 ? "view was" : "views were"}{" "}
+                recorded before sources were tracked, so {referrers.untracked === 1 ? "it isn't" : "they aren't"} counted here.
+              </p>
+            )}
+          </MetricsPanel>
+          <MetricsPanel title="Countries" subtitle="Top countries by views" icon={Globe}>
+            <RankedList data={viewsByCountry} showShare={false} limit={8} />
+          </MetricsPanel>
+          <MetricsPanel title="States and regions" subtitle="Top regions by views" icon={MapPin} className="md:col-span-2 xl:col-span-1">
+            <RankedList data={viewsByRegion} showShare={false} limit={8} emptyMessage="No region data for this period yet." />
+          </MetricsPanel>
         </div>
+        <MetricsPanel title="Devices" subtitle="What people read on" icon={Smartphone} className="mt-4">
+          <DeviceSplit data={devices} />
+        </MetricsPanel>
       </section>
 
       {/* Timing */}

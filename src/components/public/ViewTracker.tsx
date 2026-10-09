@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { PUSH_SOURCE_PARAM, PUSH_SOURCE_VALUE } from "@/lib/pushClient";
 
 // Where the reader came from. The request's own Referer header is useless here (it's always
 // this article page), and document.referrer only reflects the last full page load — after an
@@ -10,6 +11,17 @@ function getReferrer(): string {
   const nav = performance.getEntriesByType?.("navigation")[0] as PerformanceNavigationTiming | undefined;
   const isLandingPage = !nav || nav.name.split("#")[0] === location.href.split("#")[0];
   return isLandingPage ? document.referrer : location.origin;
+}
+
+// Visits from a tapped news alert arrive with ?utm_source=push (see lib/push.ts). Read the
+// tag, then drop it from the address bar so links copied from here stay clean.
+function takePushSource(): boolean {
+  const url = new URL(location.href);
+  if (url.searchParams.get(PUSH_SOURCE_PARAM) !== PUSH_SOURCE_VALUE) return false;
+  url.searchParams.delete(PUSH_SOURCE_PARAM);
+  url.searchParams.delete("utm_medium");
+  history.replaceState(history.state, "", url.pathname + url.search + url.hash);
+  return true;
 }
 
 export default function ViewTracker({ articleId }: { articleId: string }) {
@@ -25,7 +37,7 @@ export default function ViewTracker({ articleId }: { articleId: string }) {
     fetch(`/api/articles/${articleId}/view`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ referrer: getReferrer() }),
+      body: JSON.stringify(takePushSource() ? { source: "push" } : { referrer: getReferrer() }),
     })
       .then((res) => res.json())
       .then((data: { viewId?: string }) => {

@@ -313,7 +313,7 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
         )}
       </MetricsPanel>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <MetricsPanel title="How readers found it" subtitle="The site or app a reader came from" icon={Signpost}>
           <RankedList data={referrers.sources} emptyMessage="No sources recorded yet." />
           {referrers.untracked > 0 && (
@@ -326,17 +326,18 @@ export default async function ArticleMetricsPage({ params }: { params: { id: str
         <MetricsPanel title="Where readers are" subtitle="Top locations by views" icon={Globe}>
           <RankedList
             data={locations}
-            limit={10}
+            limit={8}
             emptyMessage="No location data yet — it fills in once the site is live on Vercel."
           />
         </MetricsPanel>
-        <MetricsPanel title="Devices" subtitle="What people read it on" icon={Smartphone}>
-          <DeviceSplit data={devices} />
-        </MetricsPanel>
-        <MetricsPanel title="Shared to" subtitle="Where readers shared it using the share buttons" icon={Share2}>
+        <MetricsPanel title="Shared to" subtitle="Where readers shared it using the share buttons" icon={Share2} className="md:col-span-2 xl:col-span-1">
           <RankedList data={shares} valueSuffix="shares" emptyMessage="Nobody has shared it yet." />
         </MetricsPanel>
       </div>
+
+      <MetricsPanel title="Devices" subtitle="What people read it on" icon={Smartphone}>
+        <DeviceSplit data={devices} />
+      </MetricsPanel>
 
       {/* Comments */}
       <MetricsPanel
