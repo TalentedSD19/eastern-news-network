@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { formatDate } from "@/lib/utils";
 import type { Comment } from "@/types";
 
-export default function CommentSection({ articleId }: { articleId: string }) {
+// In the editor preview the existing comments are shown (if the article exists)
+// but the form never posts.
+export default function CommentSection({ articleId, preview = false }: { articleId: string; preview?: boolean }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [name, setName] = useState("");
   const [body, setBody] = useState("");
@@ -12,6 +14,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!articleId) return;
     fetch(`/api/articles/${articleId}/comments`)
       .then((r) => r.json())
       .then(setComments);
@@ -19,6 +22,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (preview) return;
     setSubmitting(true);
     setError("");
 

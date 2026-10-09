@@ -7,6 +7,8 @@ interface Props {
   initialUp: number;
   initialDown: number;
   compact?: boolean;
+  /** Editor preview: shows the live counts (if the article exists) but never records a vote. */
+  preview?: boolean;
 }
 
 function getOrCreateToken(): string {
@@ -37,12 +39,13 @@ function ThumbDownIcon({ className }: { className?: string }) {
   );
 }
 
-export default function VoteBar({ articleId, initialUp, initialDown, compact = false }: Props) {
+export default function VoteBar({ articleId, initialUp, initialDown, compact = false, preview = false }: Props) {
   const [counts, setCounts] = useState({ up: initialUp, down: initialDown });
   const [userVote, setUserVote] = useState<"UP" | "DOWN" | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!articleId) return;
     const token = getOrCreateToken();
     fetch(`/api/articles/${articleId}/votes?voterToken=${token}`)
       .then((r) => r.json())
@@ -53,7 +56,7 @@ export default function VoteBar({ articleId, initialUp, initialDown, compact = f
   }, [articleId]);
 
   async function vote(type: "UP" | "DOWN") {
-    if (loading) return;
+    if (loading || preview) return;
     setLoading(true);
     const token = getOrCreateToken();
     const res = await fetch(`/api/articles/${articleId}/votes`, {

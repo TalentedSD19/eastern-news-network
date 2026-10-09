@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         userName={user?.name ?? session.user.name ?? "Admin"}
         avatarUrl={user?.avatarUrl ?? null}
       />
-      <div className="flex-1 bg-gray-50 dark:bg-background text-gray-900 dark:text-gray-100 p-4 sm:p-6 md:p-8 overflow-auto">{children}</div>
+      <div className="flex-1 bg-gray-50 dark:bg-background text-gray-900 dark:text-gray-100 p-4 sm:p-6 md:p-8 min-w-0">{children}</div>
     </div>
   );
 }

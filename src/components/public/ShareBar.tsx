@@ -6,6 +6,9 @@ interface Props {
   title: string;
   articleId: string;
   compact?: boolean;
+  /** Editor preview: share links point at `url` and no shares are tracked. */
+  preview?: boolean;
+  url?: string;
 }
 
 /* ── Icons ─────────────────────────────────────────────────────── */
@@ -78,15 +81,16 @@ function CheckIcon() {
 
 /* ── Component ──────────────────────────────────────────────────── */
 
-export default function ShareBar({ title, articleId, compact = false }: Props) {
+export default function ShareBar({ title, articleId, compact = false, preview = false, url }: Props) {
   const [pageUrl, setPageUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    setPageUrl(window.location.href);
-  }, []);
+    setPageUrl(url ?? window.location.href);
+  }, [url]);
 
   function trackShare(platform: string) {
+    if (preview) return;
     try {
       const blob = new Blob([JSON.stringify({ platform })], { type: "application/json" });
       navigator.sendBeacon(`/api/articles/${articleId}/share`, blob);

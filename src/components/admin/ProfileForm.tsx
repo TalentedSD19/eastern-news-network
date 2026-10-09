@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { uploadImage } from "@/lib/uploadImage";
 
 interface ProfileData {
   id: string;
@@ -32,12 +33,7 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
     setUploading(true);
     setMessage(null);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      setAvatarUrl(data.url);
+      setAvatarUrl(await uploadImage(file));
     } catch (err: unknown) {
       setMessage({ type: "error", text: err instanceof Error ? err.message : "Upload failed" });
     } finally {

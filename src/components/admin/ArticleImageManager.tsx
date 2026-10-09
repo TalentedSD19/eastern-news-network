@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import CropModal from "./CropModal";
 import type { Editor } from "@tiptap/core";
+import { uploadImage } from "@/lib/uploadImage";
 
 export type ArticleImage = { url: string; caption: string };
 
@@ -31,20 +32,11 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
   const [cropTarget, setCropTarget] = useState<{ index: number; src: string } | null>(null);
   const [cropUploading, setCropUploading] = useState(false);
 
-  async function uploadFile(file: File): Promise<string> {
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: form });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error ?? "Upload failed");
-    return data.url as string;
-  }
-
   async function handleFiles(files: FileList) {
     setError("");
     setUploading(true);
     try {
-      const urls = await Promise.all(Array.from(files).map(uploadFile));
+      const urls = await Promise.all(Array.from(files).map(uploadImage));
       onChange([...images, ...urls.map((url) => ({ url, caption: "" }))]);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Upload failed");
@@ -90,7 +82,7 @@ export default function ArticleImageManager({ images, onChange, editorRef }: Pro
     setCropUploading(true);
     try {
       const file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
-      const url = await uploadFile(file);
+      const url = await uploadImage(file);
       onChange(images.map((img, idx) => (idx === cropTarget.index ? { ...img, url } : img)));
       setCropTarget(null);
     } catch (e: unknown) {

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { uploadImage } from "@/lib/uploadImage";
 
 interface Props {
   value: string;
@@ -18,15 +19,12 @@ export default function ImageUploader({ value, onChange }: Props) {
   async function handleFile(file: File) {
     setError("");
     setUploading(true);
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: form });
-    const data = await res.json();
-    setUploading(false);
-    if (!res.ok) {
-      setError(data.error ?? "Upload failed");
-    } else {
-      onChange(data.url);
+    try {
+      onChange(await uploadImage(file));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
     }
   }
 

@@ -32,8 +32,12 @@ export async function POST(req: NextRequest) {
     notify,
   } = body;
 
-  if (!title || !excerpt || !content || !categoryId) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  // Drafts can be saved half-written; going live needs everything readers see.
+  if (!title || !categoryId) {
+    return NextResponse.json({ error: "Add a headline and category first." }, { status: 400 });
+  }
+  if (status === "PUBLISHED" && (!excerpt || !content)) {
+    return NextResponse.json({ error: "Add a summary and the story before publishing." }, { status: 400 });
   }
 
   // Derive coverImage from first image in the array if not explicitly provided
@@ -50,8 +54,8 @@ export async function POST(req: NextRequest) {
     data: {
       title,
       slug,
-      excerpt,
-      body: content,
+      excerpt: excerpt ?? "",
+      body: content ?? "",
       coverImage: resolvedCover || null,
       images: Array.isArray(images) ? images : [],
       subtitle: subtitle || null,

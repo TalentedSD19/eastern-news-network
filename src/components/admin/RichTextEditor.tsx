@@ -4,12 +4,11 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import type { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { ResizableImage } from "./ResizableImage";
-import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect } from "react";
 import {
-  Bold, Italic, Strikethrough, Heading2, Heading3, Heading4,
-  List, ListOrdered, Quote, Code, FileCode, Minus,
+  Bold, Italic, Strikethrough,
+  List, ListOrdered, Quote, Minus,
   Link2, Link2Off, Undo2, Redo2,
 } from "lucide-react";
 
@@ -38,6 +37,8 @@ function ToolbarButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
+      aria-label={title}
+      aria-pressed={active}
       className={`p-1.5 rounded transition-colors ${
         active
           ? "bg-brand-accent text-white"
@@ -57,9 +58,9 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      // StarterKit v3 already bundles the link extension; configure it here instead of adding a duplicate.
+      StarterKit.configure({ link: { openOnClick: false } }),
       ResizableImage,
-      Link.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: "Write your article here…" }),
     ],
     content: value,
@@ -75,7 +76,8 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value);
+      // Syncing from props isn't an edit — emitting here would mark a freshly opened article as changed.
+      editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [value, editor]);
 
@@ -89,10 +91,11 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
     if (editor!.isActive("link")) {
       editor!.chain().focus().unsetLink().run();
     } else {
-      const url = window.prompt("Enter URL:");
-      if (url) {
+      const input = window.prompt("Paste the web address to link to (for example bbc.com/news):")?.trim();
+      if (input) {
         try {
-          const parsed = new URL(url);
+          // People often paste "bbc.com/news" without the https:// part.
+          const parsed = new URL(/^[a-z][a-z0-9+.-]*:/i.test(input) ? input : `https://${input}`);
           if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return;
           editor!.chain().focus().setLink({ href: parsed.href, target: "_blank", rel: "noopener noreferrer" }).run();
         } catch {
@@ -126,25 +129,18 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
 
         {/* Headings */}
         <ToolbarButton
-          title="Heading 2"
+          title="Heading — starts a new section"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           active={editor.isActive("heading", { level: 2 })}
         >
-          <Heading2 size={15} />
+          <span className="px-1 text-xs font-bold">Heading</span>
         </ToolbarButton>
         <ToolbarButton
-          title="Heading 3"
+          title="Subheading — a smaller heading inside a section"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           active={editor.isActive("heading", { level: 3 })}
         >
-          <Heading3 size={15} />
-        </ToolbarButton>
-        <ToolbarButton
-          title="Heading 4"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-          active={editor.isActive("heading", { level: 4 })}
-        >
-          <Heading4 size={15} />
+          <span className="px-1 text-xs font-semibold">Subheading</span>
         </ToolbarButton>
 
         <Divider />
@@ -165,32 +161,25 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
           <Italic size={15} />
         </ToolbarButton>
         <ToolbarButton
-          title="Strikethrough"
+          title="Strike through"
           onClick={() => editor.chain().focus().toggleStrike().run()}
           active={editor.isActive("strike")}
         >
           <Strikethrough size={15} />
-        </ToolbarButton>
-        <ToolbarButton
-          title="Inline Code"
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          active={editor.isActive("code")}
-        >
-          <Code size={15} />
         </ToolbarButton>
 
         <Divider />
 
         {/* Lists */}
         <ToolbarButton
-          title="Bullet List"
+          title="Bullet list"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           active={editor.isActive("bulletList")}
         >
           <List size={15} />
         </ToolbarButton>
         <ToolbarButton
-          title="Ordered List"
+          title="Numbered list"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           active={editor.isActive("orderedList")}
         >
@@ -201,21 +190,14 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
 
         {/* Block elements */}
         <ToolbarButton
-          title="Blockquote"
+          title="Quote"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           active={editor.isActive("blockquote")}
         >
           <Quote size={15} />
         </ToolbarButton>
         <ToolbarButton
-          title="Code Block"
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          active={editor.isActive("codeBlock")}
-        >
-          <FileCode size={15} />
-        </ToolbarButton>
-        <ToolbarButton
-          title="Horizontal Rule"
+          title="Divider line"
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
         >
           <Minus size={15} />
@@ -225,7 +207,7 @@ export default function RichTextEditor({ value, onChange, editorRef }: Props) {
 
         {/* Link */}
         <ToolbarButton
-          title={editor.isActive("link") ? "Remove Link" : "Insert Link"}
+          title={editor.isActive("link") ? "Remove link" : "Add a link (select some text first)"}
           onClick={handleLink}
           active={editor.isActive("link")}
         >

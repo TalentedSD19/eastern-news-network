@@ -264,7 +264,7 @@ export interface DayCount {
 // Daily views for each article from its publish day to today (lifetime, not limited to any
 // period). Falls back to the first view for articles without a publish date; views logged
 // before publishing (previews) are left out.
-async function getLifetimeDailyViews(
+export async function getLifetimeDailyViews(
   articles: { id: string; publishedAt: Date | null }[]
 ): Promise<Map<string, DayCount[]>> {
   const series = new Map<string, DayCount[]>();
