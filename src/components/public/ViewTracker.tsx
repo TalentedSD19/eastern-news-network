@@ -2,6 +2,16 @@
 
 import { useEffect, useRef } from "react";
 
+// Where the reader came from. The request's own Referer header is useless here (it's always
+// this article page), and document.referrer only reflects the last full page load — after an
+// in-app navigation it would still name the original landing source — so a client-side
+// navigation is reported as coming from this site.
+function getReferrer(): string {
+  const nav = performance.getEntriesByType?.("navigation")[0] as PerformanceNavigationTiming | undefined;
+  const isLandingPage = !nav || nav.name.split("#")[0] === location.href.split("#")[0];
+  return isLandingPage ? document.referrer : location.origin;
+}
+
 export default function ViewTracker({ articleId }: { articleId: string }) {
   const sent = useRef(false);
   const viewIdRef = useRef<string | null>(null);
@@ -12,7 +22,11 @@ export default function ViewTracker({ articleId }: { articleId: string }) {
   useEffect(() => {
     if (sent.current) return;
     sent.current = true;
-    fetch(`/api/articles/${articleId}/view`, { method: "POST" })
+    fetch(`/api/articles/${articleId}/view`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ referrer: getReferrer() }),
+    })
       .then((res) => res.json())
       .then((data: { viewId?: string }) => {
         if (data?.viewId) viewIdRef.current = data.viewId;
