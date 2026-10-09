@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ArticleForm from "@/components/admin/ArticleForm";
+import SiteHeader from "@/components/public/SiteHeader";
+import SiteFooter from "@/components/public/SiteFooter";
 import type { ArticleWithRelations } from "@/types";
 
 export default async function EditArticlePage({ params }: { params: { id: string } }) {
@@ -19,8 +21,13 @@ export default async function EditArticlePage({ params }: { params: { id: string
 
   return (
     <div>
-      <h1 className="font-display font-medium tracking-tight text-2xl mb-6">Edit Article</h1>
-      <ArticleForm article={article as ArticleWithRelations} categories={categories} />
+      <ArticleForm
+        article={article as ArticleWithRelations}
+        categories={categories}
+        authorName={article.author.name}
+        siteHeader={<SiteHeader preview />}
+        siteFooter={<SiteFooter />}
+      />
     </div>
   );
 }

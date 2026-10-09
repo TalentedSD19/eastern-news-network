@@ -39,6 +39,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 
   const nowPublishing = status === "PUBLISHED" && existing.status !== "PUBLISHED";
+  // Drafts may be saved half-written, so check completeness at the moment one goes live.
+  if (nowPublishing && (!(excerpt || existing.excerpt) || !(content || existing.body))) {
+    return NextResponse.json({ error: "Add a summary and the story before publishing." }, { status: 400 });
+  }
 
   const article = await prisma.article.update({
     where: { id: params.id },

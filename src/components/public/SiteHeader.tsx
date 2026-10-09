@@ -7,12 +7,13 @@ import MobileMenu from "./MobileMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import NotificationPrompt from "./NotificationPrompt";
 
-export default async function SiteHeader() {
+// `preview` drops the notification prompt when the header is shown inside the editor preview.
+export default async function SiteHeader({ preview = false }: { preview?: boolean }) {
   const categories = await prisma.category.findMany({ orderBy: { name: "asc" } }).catch(() => []);
 
   return (
     <header className="sticky top-0 z-50 shadow-sm">
-      <NotificationPrompt />
+      {!preview && <NotificationPrompt />}
       {/* ── Masthead bar ── */}
       <div className="bg-brand-dark dark:bg-black">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 h-16 sm:h-[4.5rem] flex items-center gap-3">
