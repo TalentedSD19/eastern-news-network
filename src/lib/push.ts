@@ -15,7 +15,19 @@ type PublishedArticle = {
   excerpt: string;
   coverImage: string | null;
   isBreaking: boolean;
+  publishedAt: Date | null;
 };
+
+// Notification bodies get cut off after a couple of lines on most systems, so trim
+// the excerpt at a word boundary instead of letting the OS chop it mid-word.
+const BODY_MAX_CHARS = 140;
+
+function truncate(text: string, max: number): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max - 1);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), max * 0.6))}…`;
+}
 
 // Fans a "new article" notification out to every subscribed browser.
 // Subscriptions the push service reports as gone (404/410) are pruned.
@@ -27,11 +39,16 @@ export async function notifyNewArticle(article: PublishedArticle) {
 
   const payload = JSON.stringify({
     title: article.isBreaking ? `BREAKING: ${article.title}` : article.title,
-    body: article.excerpt,
+    body: truncate(article.excerpt, BODY_MAX_CHARS),
     image: article.coverImage ?? undefined,
-    url: `/article/${article.slug}`,
+    // Tagged so the article's view tracker can count visits that came from an alert.
+    url: `/article/${article.slug}?utm_source=push&utm_medium=notification`,
     tag: article.slug,
+    timestamp: (article.publishedAt ?? new Date()).getTime(),
   });
+  // Breaking news is delivered right away even to phones in battery saver; other stories
+  // can wait for the push service's normal schedule.
+  const urgency = article.isBreaking ? "high" : "normal";
 
   const expired: string[] = [];
   await Promise.allSettled(
@@ -40,7 +57,7 @@ export async function notifyNewArticle(article: PublishedArticle) {
         await webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           payload,
-          { TTL: 60 * 60 * 12, timeout: 10_000 }
+          { TTL: 60 * 60 * 12, urgency, timeout: 10_000 }
         );
       } catch (error) {
         const status = (error as { statusCode?: number }).statusCode;

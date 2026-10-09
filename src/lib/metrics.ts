@@ -176,17 +176,40 @@ export async function getViewsByCountry(days: DayRange, authorFilter?: string, l
     take: limit,
   });
 
-  let regionNames: Intl.DisplayNames | null = null;
-  try {
-    regionNames = new Intl.DisplayNames(["en"], { type: "region" });
-  } catch {
-    regionNames = null;
-  }
+  return rows.map((r) => ({ label: countryName(r.country), value: r._count.id }));
+}
 
-  return rows.map((r) => ({
-    label: (r.country && regionNames?.of(r.country)) || r.country || "Unknown",
-    value: r._count.id,
-  }));
+let regionNames: Intl.DisplayNames | null = null;
+try {
+  regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+} catch {
+  regionNames = null;
+}
+
+/** "IN" → "India"; falls back to the raw code. */
+export function countryName(code: string | null): string {
+  if (!code) return "Unknown";
+  try {
+    return regionNames?.of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+export async function getViewsByRegion(
+  days: DayRange,
+  authorFilter?: string,
+  limit = 10
+): Promise<(LabeledCount & { sublabel: string })[]> {
+  const since = rangeStart(days);
+  const rows = await prisma.articleView.groupBy({
+    by: ["region", "country"],
+    where: { viewedAt: { gte: since }, region: { not: null }, article: bylineWhere(authorFilter) },
+    _count: { id: true },
+    orderBy: { _count: { id: "desc" } },
+    take: limit,
+  });
+  return rows.map((r) => ({ label: r.region!, sublabel: countryName(r.country), value: r._count.id }));
 }
 
 export async function getViewsByCategory(days: DayRange, authorFilter?: string): Promise<LabeledCount[]> {
@@ -206,39 +229,89 @@ export async function getViewsByCategory(days: DayRange, authorFilter?: string):
   return rows.map((r) => ({ label: r.category, value: Number(r.views) }));
 }
 
-const REFERRER_RULES: [RegExp, string][] = [
-  [/google/, "Google"],
-  [/facebook|fb\.com|fb\.me/, "Facebook"],
-  [/instagram/, "Instagram"],
-  [/twitter|x\.com|t\.co/, "X / Twitter"],
-  [/whatsapp|wa\.me/, "WhatsApp"],
-  [/linkedin/, "LinkedIn"],
-  [/bing|yahoo|duckduckgo/, "Other Search"],
-];
+// Stored as ArticleView.referrerHost when a reader came from another page on this site.
+export const INTERNAL_REFERRER = "internal";
+// Stored as ArticleView.referrerHost when the reader tapped a news alert (push notification).
+export const PUSH_REFERRER = "push";
 
-function bucketReferrer(host: string | null): string {
-  if (!host) return "Direct";
-  const lower = host.toLowerCase();
-  for (const [pattern, label] of REFERRER_RULES) {
-    if (pattern.test(lower)) return label;
-  }
-  return "Other";
+const OWN_SITE_HOSTS = /(^|\.)easternnewsnetwork\.com$|^localhost$|^127\.0\.0\.1$/;
+
+export function isOwnSiteHost(host: string): boolean {
+  return OWN_SITE_HOSTS.test(host);
 }
 
-export async function getReferrerBreakdown(days: DayRange, authorFilter?: string): Promise<LabeledCount[]> {
+// Hosts are matched whole (or as a subdomain) so e.g. "reddit.com" isn't caught by "t.co".
+// The com.* patterns are Android app referrers (android-app://com.whatsapp → "com.whatsapp").
+const REFERRER_RULES: [RegExp, string][] = [
+  [/(^|\.)news\.google\.|^com\.google\.android\.apps\.magazines/, "Google News"],
+  [/(^|\.)google\.[a-z.]+$|^com\.google\./, "Google"],
+  [/(^|\.)(facebook\.com|fb\.com|fb\.me)$|^com\.facebook\./, "Facebook"],
+  [/(^|\.)instagram\.com$|^com\.instagram\./, "Instagram"],
+  [/(^|\.)(twitter\.com|x\.com|t\.co)$|^com\.twitter\./, "X / Twitter"],
+  [/(^|\.)(whatsapp\.com|whatsapp\.net|wa\.me)$|^com\.whatsapp/, "WhatsApp"],
+  [/(^|\.)(linkedin\.com|lnkd\.in)$|^com\.linkedin\./, "LinkedIn"],
+  [/(^|\.)(telegram\.org|t\.me)$|^org\.telegram\./, "Telegram"],
+  [/(^|\.)(youtube\.com|youtu\.be)$|^com\.google\.android\.youtube/, "YouTube"],
+  [/(^|\.)reddit\.com$/, "Reddit"],
+  [/(^|\.)(bing\.com|yahoo\.com|duckduckgo\.com|ecosia\.org|yandex\.[a-z]+|baidu\.com)$/, "Other search engines"],
+];
+
+/** Label for a stored referrer host, or null for views recorded before the page sent its referrer. */
+function bucketReferrer(host: string | null): { label: string; sublabel?: string } | null {
+  if (!host) return { label: "Direct", sublabel: "typed address, bookmark or a link in an app" };
+  if (host === INTERNAL_REFERRER) return { label: "ENN pages", sublabel: "homepage or another article" };
+  if (host === PUSH_REFERRER) return { label: "News alerts", sublabel: "tapped a push notification" };
+  const lower = host.toLowerCase();
+  // Older views stored the article's own host (the tracker request's Referer), so the real source is unknown.
+  if (isOwnSiteHost(lower)) return null;
+  for (const [pattern, label] of REFERRER_RULES) {
+    if (pattern.test(lower)) return { label };
+  }
+  return { label: lower.replace(/^(www|m)\./, "") };
+}
+
+export interface ReferrerBreakdown {
+  sources: (LabeledCount & { sublabel?: string })[];
+  /** Views recorded before referrer tracking was fixed — their source is unknown. */
+  untracked: number;
+}
+
+function bucketReferrerRows(rows: { referrerHost: string | null; _count: { id: number } }[]): ReferrerBreakdown {
+  const buckets = new Map<string, { value: number; sublabel?: string }>();
+  let untracked = 0;
+  for (const r of rows) {
+    const bucket = bucketReferrer(r.referrerHost);
+    if (!bucket) {
+      untracked += r._count.id;
+      continue;
+    }
+    const entry = buckets.get(bucket.label) ?? { value: 0, sublabel: bucket.sublabel };
+    entry.value += r._count.id;
+    buckets.set(bucket.label, entry);
+  }
+  const sources = Array.from(buckets, ([label, { value, sublabel }]) => ({ label, value, sublabel })).sort(
+    (a, b) => b.value - a.value
+  );
+  return { sources, untracked };
+}
+
+export async function getReferrerBreakdown(days: DayRange, authorFilter?: string): Promise<ReferrerBreakdown> {
   const since = rangeStart(days);
   const rows = await prisma.articleView.groupBy({
     by: ["referrerHost"],
     where: { viewedAt: { gte: since }, article: bylineWhere(authorFilter) },
     _count: { id: true },
   });
+  return bucketReferrerRows(rows);
+}
 
-  const buckets = new Map<string, number>();
-  for (const r of rows) {
-    const label = bucketReferrer(r.referrerHost);
-    buckets.set(label, (buckets.get(label) ?? 0) + r._count.id);
-  }
-  return Array.from(buckets, ([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
+export async function getArticleReferrers(articleId: string): Promise<ReferrerBreakdown> {
+  const rows = await prisma.articleView.groupBy({
+    by: ["referrerHost"],
+    where: { articleId },
+    _count: { id: true },
+  });
+  return bucketReferrerRows(rows);
 }
 
 export async function getDeviceBreakdown(days: DayRange, authorFilter?: string): Promise<LabeledCount[]> {
@@ -314,6 +387,8 @@ export interface TopArticle {
   id: string;
   title: string;
   slug: string;
+  coverImage: string | null;
+  byline: string;
   category: string;
   publishedAt: Date | null;
   views: number; // within the selected period
@@ -333,7 +408,16 @@ export async function getTopArticles(days: DayRange, authorFilter?: string, limi
 
   const articles = await prisma.article.findMany({
     where: { id: { in: grouped.map((g) => g.articleId) } },
-    select: { id: true, title: true, slug: true, publishedAt: true, category: { select: { name: true } } },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      coverImage: true,
+      publishedAt: true,
+      reporterName: true,
+      author: { select: { name: true } },
+      category: { select: { name: true } },
+    },
   });
   const byId = new Map(articles.map((a) => [a.id, a]));
   const daily = await getLifetimeDailyViews(articles);
@@ -346,6 +430,8 @@ export async function getTopArticles(days: DayRange, authorFilter?: string, limi
         id: article.id,
         title: article.title,
         slug: article.slug,
+        coverImage: article.coverImage,
+        byline: article.reporterName ?? article.author.name,
         category: article.category.name,
         publishedAt: article.publishedAt,
         views: g._count.id,
@@ -460,5 +546,188 @@ export async function getReadCompletion(days: DayRange, authorFilter?: string): 
     avgActiveSeconds: Math.round(agg._avg.activeSeconds ?? 0),
     completionRate: tracked > 0 ? Math.round((completed / tracked) * 100) : 0,
     trackedViews: tracked,
+  };
+}
+
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/** Views by day of the week in IST, Monday first. */
+export async function getViewsByWeekday(days: DayRange, authorFilter?: string): Promise<LabeledCount[]> {
+  const since = rangeStart(days);
+  const authorFrag = authorFilterFragment(authorFilter);
+  // ISODOW: 1 = Monday … 7 = Sunday
+  const rows = await prisma.$queryRaw<{ dow: number; views: bigint }[]>`
+    SELECT EXTRACT(ISODOW FROM (v."viewedAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata'))::int AS dow,
+           COUNT(*)::bigint AS views
+    FROM "ArticleView" v
+    JOIN "Article" a ON a.id = v."articleId"
+    LEFT JOIN "User" u ON u.id = a."authorId"
+    WHERE v."viewedAt" >= ${since}
+    ${authorFrag}
+    GROUP BY dow
+  `;
+  const counts = new Map(rows.map((r) => [Number(r.dow), Number(r.views)]));
+  return WEEKDAYS.map((label, i) => ({ label, value: counts.get(i + 1) ?? 0 }));
+}
+
+export interface AuthorStats {
+  byline: string;
+  published: number; // articles published within the period
+  views: number; // views within the period, on any of their articles
+  articlesRead: number; // how many of their articles got at least one view in the period
+  completionRate: number | null; // % of tracked views that reached 80%+ scroll; null = no data
+  reactions: number; // votes + comments within the period
+}
+
+// Per-byline totals for the period, most-viewed first. Same byline resolution as bylineWhere.
+export async function getAuthorLeaderboard(days: DayRange): Promise<AuthorStats[]> {
+  const since = rangeStart(days);
+  const [viewRows, publishedRows, reactionRows] = await Promise.all([
+    prisma.$queryRaw<{ byline: string; views: bigint; articles: bigint; tracked: bigint; completed: bigint }[]>`
+      SELECT COALESCE(a."reporterName", u.name) AS byline,
+             COUNT(*)::bigint AS views,
+             COUNT(DISTINCT v."articleId")::bigint AS articles,
+             COUNT(*) FILTER (WHERE v."maxScrollPct" IS NOT NULL)::bigint AS tracked,
+             COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80)::bigint AS completed
+      FROM "ArticleView" v
+      JOIN "Article" a ON a.id = v."articleId"
+      LEFT JOIN "User" u ON u.id = a."authorId"
+      WHERE v."viewedAt" >= ${since}
+      GROUP BY byline
+    `,
+    prisma.$queryRaw<{ byline: string; published: bigint }[]>`
+      SELECT COALESCE(a."reporterName", u.name) AS byline, COUNT(*)::bigint AS published
+      FROM "Article" a
+      LEFT JOIN "User" u ON u.id = a."authorId"
+      WHERE a.status = 'PUBLISHED' AND a."publishedAt" >= ${since}
+      GROUP BY byline
+    `,
+    prisma.$queryRaw<{ byline: string; reactions: bigint }[]>`
+      SELECT COALESCE(a."reporterName", u.name) AS byline, COUNT(*)::bigint AS reactions
+      FROM (
+        SELECT "articleId" FROM "Comment" WHERE "createdAt" >= ${since}
+        UNION ALL
+        SELECT "articleId" FROM "Vote" WHERE "createdAt" >= ${since}
+      ) r
+      JOIN "Article" a ON a.id = r."articleId"
+      LEFT JOIN "User" u ON u.id = a."authorId"
+      GROUP BY byline
+    `,
+  ]);
+
+  const stats = new Map<string, AuthorStats>();
+  const entry = (byline: string) => {
+    let row = stats.get(byline);
+    if (!row) {
+      row = { byline, published: 0, views: 0, articlesRead: 0, completionRate: null, reactions: 0 };
+      stats.set(byline, row);
+    }
+    return row;
+  };
+  for (const r of viewRows) {
+    const row = entry(r.byline);
+    row.views = Number(r.views);
+    row.articlesRead = Number(r.articles);
+    const tracked = Number(r.tracked);
+    row.completionRate = tracked > 0 ? Math.round((Number(r.completed) / tracked) * 100) : null;
+  }
+  for (const r of publishedRows) entry(r.byline).published = Number(r.published);
+  for (const r of reactionRows) entry(r.byline).reactions = Number(r.reactions);
+
+  return Array.from(stats.values()).sort((a, b) => b.views - a.views || b.published - a.published);
+}
+
+export interface ArticleScore {
+  id: string;
+  title: string;
+  byline: string;
+  value: number;
+  /** Supporting number for the value: comments for "most discussed", tracked views for completion. */
+  basis: number;
+}
+
+const MIN_TRACKED_VIEWS_FOR_COMPLETION = 20;
+
+/** Articles with the most votes + comments in the period. */
+export async function getMostDiscussed(days: DayRange, authorFilter?: string, limit = 5): Promise<ArticleScore[]> {
+  const since = rangeStart(days);
+  const authorFrag = authorFilterFragment(authorFilter);
+  const rows = await prisma.$queryRaw<{ id: string; title: string; byline: string; comments: bigint; total: bigint }[]>`
+    SELECT a.id, a.title, COALESCE(a."reporterName", u.name) AS byline,
+           COUNT(*) FILTER (WHERE r.kind = 'comment')::bigint AS comments,
+           COUNT(*)::bigint AS total
+    FROM (
+      SELECT "articleId", 'comment' AS kind FROM "Comment" WHERE "createdAt" >= ${since}
+      UNION ALL
+      SELECT "articleId", 'vote' AS kind FROM "Vote" WHERE "createdAt" >= ${since}
+    ) r
+    JOIN "Article" a ON a.id = r."articleId"
+    LEFT JOIN "User" u ON u.id = a."authorId"
+    WHERE TRUE ${authorFrag}
+    GROUP BY a.id, a.title, byline
+    ORDER BY total DESC
+    LIMIT ${limit}
+  `;
+  return rows.map((r) => ({ id: r.id, title: r.title, byline: r.byline, value: Number(r.total), basis: Number(r.comments) }));
+}
+
+/**
+ * Articles the highest share of readers finished (80%+ scroll), among those with enough
+ * tracked views for the rate to mean something.
+ */
+export async function getBestCompletion(days: DayRange, authorFilter?: string, limit = 5): Promise<ArticleScore[]> {
+  const since = rangeStart(days);
+  const authorFrag = authorFilterFragment(authorFilter);
+  const rows = await prisma.$queryRaw<{ id: string; title: string; byline: string; tracked: bigint; completed: bigint }[]>`
+    SELECT a.id, a.title, COALESCE(a."reporterName", u.name) AS byline,
+           COUNT(*)::bigint AS tracked,
+           COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80)::bigint AS completed
+    FROM "ArticleView" v
+    JOIN "Article" a ON a.id = v."articleId"
+    LEFT JOIN "User" u ON u.id = a."authorId"
+    WHERE v."viewedAt" >= ${since} AND v."maxScrollPct" IS NOT NULL
+    ${authorFrag}
+    GROUP BY a.id, a.title, byline
+    HAVING COUNT(*) >= ${MIN_TRACKED_VIEWS_FOR_COMPLETION}
+    ORDER BY COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80)::float / COUNT(*) DESC, COUNT(*) DESC
+    LIMIT ${limit}
+  `;
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    byline: r.byline,
+    value: Math.round((Number(r.completed) / Number(r.tracked)) * 100),
+    basis: Number(r.tracked),
+  }));
+}
+
+export interface CategoryComparison {
+  category: string;
+  rank: number; // 1 = most-viewed published article in its category (lifetime)
+  of: number; // published articles in the category
+  categoryAverage: number; // average lifetime views per published article in the category
+}
+
+/** Where one article stands among the published articles in its category, by lifetime views. */
+export async function getCategoryComparison(article: {
+  id: string;
+  categoryId: string;
+  category: { name: string };
+}): Promise<CategoryComparison> {
+  const rows = await prisma.$queryRaw<{ id: string; views: bigint }[]>`
+    SELECT a.id, COUNT(v.id)::bigint AS views
+    FROM "Article" a
+    LEFT JOIN "ArticleView" v ON v."articleId" = a.id
+    WHERE a."categoryId" = ${article.categoryId} AND a.status = 'PUBLISHED'
+    GROUP BY a.id
+  `;
+  const views = rows.map((r) => ({ id: r.id, views: Number(r.views) }));
+  const own = views.find((r) => r.id === article.id)?.views ?? 0;
+  const total = views.reduce((sum, r) => sum + r.views, 0);
+  return {
+    category: article.category.name,
+    rank: views.filter((r) => r.views > own).length + 1,
+    of: views.length,
+    categoryAverage: views.length > 0 ? total / views.length : 0,
   };
 }

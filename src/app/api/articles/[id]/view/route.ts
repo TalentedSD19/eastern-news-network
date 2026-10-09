@@ -2,13 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { classifyDevice } from "@/lib/device";
+import { INTERNAL_REFERRER, PUSH_REFERRER, isOwnSiteHost } from "@/lib/metrics";
 
 const VISITOR_COOKIE = "enn_vid";
 
-function getReferrerHost(referer: string | null): string | null {
-  if (!referer) return null;
+// `referrer` is sent by the page (see ViewTracker) — this request's own Referer header is always
+// the article itself. Visits from another page on this site are stored as INTERNAL_REFERRER.
+function getReferrerHost(referrer: unknown, requestHost: string): string | null {
+  if (typeof referrer !== "string" || !referrer) return null;
   try {
-    return new URL(referer).hostname || null;
+    const host = new URL(referrer).hostname.toLowerCase().slice(0, 255);
+    if (!host) return null;
+    return host === requestHost || isOwnSiteHost(host) ? INTERNAL_REFERRER : host;
   } catch {
     return null;
   }
@@ -53,7 +58,9 @@ export async function POST(
     if (ip !== "127.0.0.1") geo = await getGeoFromIp(ip);
   }
 
-  const referrerHost = getReferrerHost(request.headers.get("referer"));
+  const body = (await request.json().catch(() => null)) as { referrer?: unknown; source?: unknown } | null;
+  const referrerHost =
+    body?.source === "push" ? PUSH_REFERRER : getReferrerHost(body?.referrer, request.nextUrl.hostname);
   const userAgent = request.headers.get("user-agent");
   const deviceType = userAgent ? classifyDevice(userAgent) : null;
 
