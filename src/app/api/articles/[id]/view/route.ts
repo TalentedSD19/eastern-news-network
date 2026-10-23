@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { prisma } from "@/lib/prisma";
 import { classifyDevice } from "@/lib/device";
 import { INTERNAL_REFERRER, PUSH_REFERRER, isOwnSiteHost } from "@/lib/metrics";
@@ -19,19 +20,15 @@ function getReferrerHost(referrer: unknown, requestHost: string): string | null 
   }
 }
 
-async function getGeoFromIp(ip: string) {
-  try {
-    const res = await fetch(`https://ipwho.is/${ip}`, { cache: "no-store" });
-    if (!res.ok) return { country: null, region: null, city: null };
-    const data = await res.json();
-    return {
-      country: (data.country_code as string) ?? null,
-      region: (data.region as string) ?? null,
-      city: (data.city as string) ?? null,
-    };
-  } catch {
-    return { country: null, region: null, city: null };
-  }
+// Cloudflare reports "XX" when it can't place an IP and "T1" for Tor exit nodes.
+const UNKNOWN_COUNTRIES = new Set(["XX", "T1"]);
+
+// Cloudflare geolocates every request at the edge and attaches the result as
+// request.cf, so there's nothing to look up.
+function getGeo() {
+  const cf = getCloudflareContext().cf as { country?: string; region?: string; city?: string } | undefined;
+  const country = cf?.country && !UNKNOWN_COUNTRIES.has(cf.country) ? cf.country : null;
+  return { country, region: cf?.region || null, city: cf?.city || null };
 }
 
 export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
@@ -42,19 +39,7 @@ export async function POST(request: NextRequest, props: { params: Promise<{ id: 
   });
   if (!article) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Use Vercel geo headers if present, otherwise fall back to IP lookup (Railway)
-  const country = request.headers.get("x-vercel-ip-country");
-  const region = request.headers.get("x-vercel-ip-region");
-  const city = request.headers.get("x-vercel-ip-city");
-
-  let geo = { country, region, city };
-  if (!country) {
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-      request.headers.get("x-real-ip") ??
-      "127.0.0.1";
-    if (ip !== "127.0.0.1") geo = await getGeoFromIp(ip);
-  }
+  const geo = getGeo();
 
   const body = (await request.json().catch(() => null)) as { referrer?: unknown; source?: unknown } | null;
   const referrerHost =

@@ -33,5 +33,8 @@ const nextConfig = {
 
 export default nextConfig;
 
-// Lets `next dev` read Cloudflare bindings through getCloudflareContext().
-import("@opennextjs/cloudflare").then((m) => m.initOpenNextCloudflareForDev());
+// Lets `next dev` read Cloudflare bindings through getCloudflareContext(). Skipped for
+// builds, which don't need bindings and can't open the remote R2 session without a login.
+if (process.env.NODE_ENV === "development") {
+  import("@opennextjs/cloudflare").then((m) => m.initOpenNextCloudflareForDev());
+}

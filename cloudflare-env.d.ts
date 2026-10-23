@@ -4,4 +4,5 @@
 // the browser code relies on. Keep in sync with wrangler.jsonc.
 interface CloudflareEnv {
   DB: import("@cloudflare/workers-types").D1Database;
+  ARTICLE_IMAGES: import("@cloudflare/workers-types").R2Bucket;
 }

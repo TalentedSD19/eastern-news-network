@@ -11,6 +11,18 @@
 	"observability": {
 		"enabled": true
 	},
+	"r2_buckets": [
+		{
+			// Images uploaded from the editor, served publicly from R2_PUBLIC_URL
+			"binding": "ARTICLE_IMAGES",
+			"bucket_name": "article-images",
+			// The real bucket in dev too, so uploaded images show up at their public URL
+			"remote": true
+		}
+	],
+	"vars": {
+		"R2_PUBLIC_URL": "https://pub-789a8d0ff4b244d6bdb9408b87d3c3e0.r2.dev"
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
