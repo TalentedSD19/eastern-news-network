@@ -27,8 +27,7 @@
 		{
 			"binding": "DB",
 			"database_name": "eastern-news-network",
-			// Replace with the id printed by `wrangler d1 create eastern-news-network`
-			"database_id": "00000000-0000-0000-0000-000000000000",
+			"database_id": "700bb14f-6e22-416a-854c-3c607fc281ab",
 			// SQL files generated with `prisma migrate diff`, applied with `wrangler d1 migrations apply`
 			"migrations_dir": "prisma/migrations"
 		}
