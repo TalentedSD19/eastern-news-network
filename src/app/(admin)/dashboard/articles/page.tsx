@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { BarChart3, CheckCircle2, ImageIcon, MessageSquare, Plus, ThumbsDown, ThumbsUp, X, type LucideIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { cn, formatDate } from "@/lib/utils";
@@ -29,9 +29,9 @@ export default async function ArticlesListPage(props: {
   const searchWhere: Prisma.ArticleWhereInput = q
     ? {
         OR: [
-          { title: { contains: q, mode: "insensitive" } },
-          { category: { name: { contains: q, mode: "insensitive" } } },
-          { reporterName: { contains: q, mode: "insensitive" } },
+          { title: { contains: q } },
+          { category: { name: { contains: q } } },
+          { reporterName: { contains: q } },
         ],
       }
     : {};

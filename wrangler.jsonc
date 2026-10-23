@@ -10,7 +10,17 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "eastern-news-network",
+			// Replace with the id printed by `wrangler d1 create eastern-news-network`
+			"database_id": "00000000-0000-0000-0000-000000000000",
+			// SQL files generated with `prisma migrate diff`, applied with `wrangler d1 migrations apply`
+			"migrations_dir": "prisma/migrations"
+		}
+	]
 	// No "images" binding on purpose: Cloudflare Images bills per transformation,
 	// and without it /_next/image serves the original file untouched.
 	// Secrets (NEXTAUTH_SECRET, VAPID_PRIVATE_KEY, ...) go in `wrangler secret put`

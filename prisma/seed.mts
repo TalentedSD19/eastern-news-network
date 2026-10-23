@@ -1,9 +1,14 @@
+import { PrismaD1 } from "@prisma/adapter-d1";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { getPlatformProxy } from "wrangler";
 
-const prisma = new PrismaClient();
-
+// Seeds the local D1 database that `next dev` and `npm run preview` use
+// (apply migrations first: `npx wrangler d1 migrations apply DB --local`).
 async function main() {
+  const { env, dispose } = await getPlatformProxy<CloudflareEnv>();
+  const prisma = new PrismaClient({ adapter: new PrismaD1(env.DB) });
+
   const password1 = await bcrypt.hash("admin1234", 12);
   const password2 = await bcrypt.hash("editor1234", 12);
 
@@ -39,8 +44,9 @@ async function main() {
   console.log(`  ${admin.email}  /  admin1234`);
   console.log(`  ${editor.email}  /  editor1234`);
   console.log("Seeded 5 categories.");
+
+  await prisma.$disconnect();
+  await dispose();
 }
 
-main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+main().catch(console.error);

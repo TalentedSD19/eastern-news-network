@@ -1,5 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Kept out of webpack so the Cloudflare adapter's bundler packs Prisma, including the
+  // query compiler .wasm that src/lib/prisma-runtime.ts loads through "@prisma/client/wasm".
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
+  // `next dev` (Turbopack) runs on Node, which can't load Prisma's Workers build, so it
+  // gets the Node build instead. Production builds use webpack and keep the Workers build.
+  turbopack: {
+    resolveAlias: {
+      "@/lib/prisma-runtime": "./src/lib/prisma-runtime.node.ts",
+    },
+  },
   images: {
     remotePatterns: [
       {

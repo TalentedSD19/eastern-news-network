@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
 
+// Rendered per request so the header and footer list the current categories;
+// prerendering at build time froze them (empty, since the build has no database).
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Editorial Policy",
   description:
