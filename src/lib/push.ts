@@ -1,5 +1,5 @@
 import webpush from "web-push";
-import { prisma } from "@/lib/prisma";
+import { inChunks, prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/seo";
 
 const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -68,6 +68,8 @@ export async function notifyNewArticle(article: PublishedArticle) {
   );
 
   if (expired.length > 0) {
-    await prisma.pushSubscription.deleteMany({ where: { endpoint: { in: expired } } });
+    for (const endpoints of inChunks(expired)) {
+      await prisma.pushSubscription.deleteMany({ where: { endpoint: { in: endpoints } } });
+    }
   }
 }

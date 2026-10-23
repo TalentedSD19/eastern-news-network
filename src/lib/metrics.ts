@@ -1,15 +1,11 @@
 import { Prisma } from "@/lib/prisma-runtime";
-import { prisma } from "@/lib/prisma";
+import { inChunks, prisma } from "@/lib/prisma";
 
 export type DayRange = number | null; // null = all time
 
 // SQLite (D1) has no time zones; IST is a fixed UTC+5:30 with no daylight saving,
 // so shifting with these strftime() modifiers is exact.
 const IST = Prisma.sql`'+5 hours', '+30 minutes'`;
-
-// D1 caps a query at 100 bound parameters, and raw IN lists aren't split up the way
-// Prisma splits its own queries.
-const MAX_IN_LIST = 90;
 
 // date() results usually come back as "yyyy-mm-dd" text, but the D1 adapter can turn
 // date-shaped text into a Date, so accept either.
@@ -357,12 +353,9 @@ export async function getLifetimeDailyViews(
   const series = new Map<string, DayCount[]>();
   if (articles.length === 0) return series;
 
-  const ids = articles.map((a) => a.id);
-  const chunks: string[][] = [];
-  for (let i = 0; i < ids.length; i += MAX_IN_LIST) chunks.push(ids.slice(i, i + MAX_IN_LIST));
   const rows = (
     await Promise.all(
-      chunks.map(
+      inChunks(articles.map((a) => a.id)).map(
         (chunk) => prisma.$queryRaw<{ articleId: string; day: string | Date; views: number }[]>`
           SELECT v."articleId", date(v."viewedAt") AS day, COUNT(*) AS views
           FROM "ArticleView" v

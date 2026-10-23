@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { useSecureCookies } from "@/lib/sessionCookie";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -29,6 +30,7 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: { signIn: "/login" },
   session: { strategy: "jwt" },
+  useSecureCookies,
   callbacks: {
     jwt({ token, user }) {
       if (user) token.id = user.id;

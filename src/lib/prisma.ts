@@ -25,6 +25,16 @@ function unavailable(error: unknown): never {
   return new Proxy(reject, { get: () => unavailable(error) }) as never;
 }
 
+// D1 rejects any query with more than 100 bound parameters, and Prisma doesn't split
+// every query's IN list (groupBy, deleteMany, raw SQL) to fit. Run such queries over
+// these chunks and combine the results.
+const MAX_IN_LIST = 90;
+export function inChunks<T>(items: T[]): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += MAX_IN_LIST) chunks.push(items.slice(i, i + MAX_IN_LIST));
+  return chunks;
+}
+
 // Same API as a PrismaClient (`prisma.article.findMany(...)`), resolved per request.
 export const prisma = new Proxy({} as PrismaClient, {
   get(_target, property) {
