@@ -4,9 +4,9 @@ import { slugify } from "@/lib/utils";
 
 const BASE_URL = "https://easternnewsnetwork.com";
 
-// Without this the sitemap is prerendered once at build and never lists
-// articles published after the last deploy.
-export const revalidate = 600;
+// Render per request: a revalidate value still prerenders at build, which
+// needs the database and fails on hosts (Railway) that can't reach it then.
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [articles, categories] = await Promise.all([

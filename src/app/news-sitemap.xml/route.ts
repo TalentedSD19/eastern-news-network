@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 
-// Without this Next prerenders the route at build time, freezing the list —
-// and Google News only reads articles from the last 48 hours.
-export const revalidate = 300;
+// Render per request (cached via Cache-Control below). A revalidate value would
+// still prerender at build, which needs the database and fails on Railway.
+export const dynamic = "force-dynamic";
 
 const BASE_URL = "https://easternnewsnetwork.com";
 const PUBLICATION_NAME = "Eastern News Network";
