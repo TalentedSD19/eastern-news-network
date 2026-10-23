@@ -19,11 +19,10 @@ const STATUS_TABS = [
   { value: "DRAFT", label: "Drafts" },
 ] as const;
 
-export default async function ArticlesListPage({
-  searchParams,
-}: {
-  searchParams: { q?: string; status?: string; published?: string };
+export default async function ArticlesListPage(props: {
+  searchParams: Promise<{ q?: string; status?: string; published?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const q = searchParams.q?.trim();
   const status = STATUS_TABS.find((t) => t.value === searchParams.status)?.value;
 

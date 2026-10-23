@@ -22,3 +22,6 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
+// Lets `next dev` read Cloudflare bindings through getCloudflareContext().
+import("@opennextjs/cloudflare").then((m) => m.initOpenNextCloudflareForDev());

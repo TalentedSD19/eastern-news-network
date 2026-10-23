@@ -11,7 +11,8 @@ const ALLOWED_PLATFORMS = new Set([
   "Copy link",
 ]);
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   let body: { platform?: unknown };
   try {
     body = await request.json();

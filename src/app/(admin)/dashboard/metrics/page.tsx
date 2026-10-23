@@ -98,11 +98,10 @@ function pct(part: number, whole: number): number {
   return whole > 0 ? Math.round((part / whole) * 100) : 0;
 }
 
-export default async function MetricsPage({
-  searchParams,
-}: {
-  searchParams: { days?: string; author?: string };
+export default async function MetricsPage(props: {
+  searchParams: Promise<{ days?: string; author?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const RANGES = buildRanges();
   const activeValue = RANGES.some((r) => r.value === searchParams.days) ? searchParams.days! : DEFAULT_RANGE;
   const activeRange = RANGES.find((r) => r.value === activeValue)!;

@@ -11,7 +11,8 @@ import { fillAuthorImages } from "@/lib/authorImages";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const category = await prisma.category.findUnique({ where: { slug: params.slug } });
   // Throwing here (not just in the page) sends a real 404: metadata resolves before
   // the loading.tsx shell streams, after which the status is locked at 200.
@@ -40,13 +41,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 const PAGE_SIZE = 12;
 
-export default async function CategoryPage({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams: { page?: string };
+export default async function CategoryPage(props: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const category = await prisma.category.findUnique({ where: { slug: params.slug } });
   if (!category) notFound();
 

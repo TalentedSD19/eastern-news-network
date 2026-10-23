@@ -34,10 +34,8 @@ async function getGeoFromIp(ip: string) {
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const article = await prisma.article.findUnique({
     where: { id: params.id },
     select: { id: true },

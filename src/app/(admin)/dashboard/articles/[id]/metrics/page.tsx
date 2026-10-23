@@ -42,7 +42,8 @@ function formatSeconds(total: number): string {
   return m > 0 ? `${m}m ${s}s` : `${s}s`;
 }
 
-export default async function ArticleMetricsPage({ params }: { params: { id: string } }) {
+export default async function ArticleMetricsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const article = await prisma.article.findUnique({
     where: { id: params.id },
     select: {

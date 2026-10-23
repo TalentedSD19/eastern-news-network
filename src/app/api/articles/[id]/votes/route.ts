@@ -12,10 +12,8 @@ async function getVoteCounts(articleId: string) {
   return { up, down };
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const voterToken = request.nextUrl.searchParams.get("voterToken");
   const counts = await getVoteCounts(params.id);
 
@@ -31,10 +29,8 @@ export async function GET(
   return NextResponse.json({ ...counts, userVote });
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const body = await request.json();
   const voterToken = (body.voterToken ?? "").trim().slice(0, 64);
   const voteType: "UP" | "DOWN" = body.voteType === "DOWN" ? "DOWN" : "UP";

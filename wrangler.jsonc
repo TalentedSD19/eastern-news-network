@@ -1,0 +1,18 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "eastern-news-network",
+	"compatibility_date": "2026-10-19",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true
+	}
+	// No "images" binding on purpose: Cloudflare Images bills per transformation,
+	// and without it /_next/image serves the original file untouched.
+	// Secrets (NEXTAUTH_SECRET, VAPID_PRIVATE_KEY, ...) go in `wrangler secret put`
+	// and, locally, .dev.vars — never in this file.
+}

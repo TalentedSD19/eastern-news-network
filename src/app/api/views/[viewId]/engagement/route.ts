@@ -6,7 +6,8 @@ function clamp(n: unknown, min: number, max: number): number | null {
   return Math.max(min, Math.min(max, Math.round(n)));
 }
 
-export async function POST(request: NextRequest, { params }: { params: { viewId: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ viewId: string }> }) {
+  const params = await props.params;
   let body: { maxScrollPct?: unknown; activeSeconds?: unknown };
   try {
     body = await request.json();
