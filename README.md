@@ -7,7 +7,7 @@ running on Cloudflare Workers through the [OpenNext adapter](https://opennext.js
 |---|---|
 | App | Cloudflare Worker `eastern-news-network` |
 | Database | Cloudflare D1 `eastern-news-network` (SQLite, via Prisma's D1 adapter) |
-| Images | R2 bucket `article-images`, served from its public `r2.dev` URL |
+| Images | R2 bucket `article-images`, served from `images.easternnewsnetwork.com` |
 | Domain / DNS | Cloudflare (registered through Vercel) |
 
 ## Local development
