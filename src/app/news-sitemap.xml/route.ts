@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 // Render per request (cached via Cache-Control below). A revalidate value would
-// still prerender at build, which needs the database and fails on Railway.
+// still prerender at build time, when there is no database to read.
 export const dynamic = "force-dynamic";
 
 const BASE_URL = "https://easternnewsnetwork.com";

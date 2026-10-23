@@ -328,7 +328,7 @@ export default async function ArticleMetricsPage(props: { params: Promise<{ id: 
           <RankedList
             data={locations}
             limit={8}
-            emptyMessage="No location data yet — it fills in once the site is live on Vercel."
+            emptyMessage="No location data yet — it fills in as readers visit."
           />
         </MetricsPanel>
         <MetricsPanel title="Shared to" subtitle="Where readers shared it using the share buttons" icon={Share2} className="md:col-span-2 xl:col-span-1">
