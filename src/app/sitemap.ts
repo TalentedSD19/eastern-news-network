@@ -4,8 +4,8 @@ import { slugify } from "@/lib/utils";
 
 const BASE_URL = "https://easternnewsnetwork.com";
 
-// Render per request: a revalidate value still prerenders at build, which
-// needs the database and fails on hosts (Railway) that can't reach it then.
+// Render per request: a revalidate value would still prerender at build time,
+// when there is no database to read.
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

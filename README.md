@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Eastern News Network
 
-## Getting Started
+The news site at [easternnewsnetwork.com](https://easternnewsnetwork.com): a Next.js 15 app
+running on Cloudflare Workers through the [OpenNext adapter](https://opennext.js.org/cloudflare).
 
-First, run the development server:
+| Piece | Where it lives |
+|---|---|
+| App | Cloudflare Worker `eastern-news-network` |
+| Database | Cloudflare D1 `eastern-news-network` (SQLite, via Prisma's D1 adapter) |
+| Images | R2 bucket `article-images`, served from its public `r2.dev` URL |
+| Domain / DNS | Cloudflare (registered through Vercel) |
 
-```bash
+## Local development
+
+```sh
+npm install
+npx wrangler login                              # the R2 bucket is remote even in dev
+npx wrangler d1 migrations apply DB --local     # create the local D1 database
+npm run seed                                    # admin@ / editor@easternnewsnetwork.com
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run dev` reads D1 and R2 through `getCloudflareContext()`; the database is a local
+SQLite copy, while image uploads go to the real bucket. `npm run preview` runs the production
+build in the Workers runtime locally.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment and secrets
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The Cloudflare build bundles every value in `.env*` files into the Worker, so they must
+never hold secrets.
 
-## Learn More
+- `.env`: public values only (`NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `R2_PUBLIC_URL`).
+- `.env.development.local`: dev-only `NEXTAUTH_SECRET` and `NEXTAUTH_URL`.
+- Production secrets are Worker secrets: `npx wrangler secret put NEXTAUTH_SECRET`,
+  `npx wrangler secret put VAPID_PRIVATE_KEY`.
+- Other production settings are `vars` in `wrangler.jsonc`.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploying
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Merging to `main` triggers Cloudflare Workers Builds, which runs
+`npx opennextjs-cloudflare build` and `npx opennextjs-cloudflare deploy`.
+`npm run deploy` does the same from a local checkout.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Database changes
 
-## Deploy on Vercel
+Migrations are plain SQL files in `prisma/migrations`, applied by Wrangler:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sh
+# after editing prisma/schema.prisma: diff the last committed schema against the new one
+git show HEAD:prisma/schema.prisma > /tmp/schema.before.prisma
+npx prisma migrate diff --from-schema-datamodel /tmp/schema.before.prisma \
+  --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0002_describe_change.sql
+npx wrangler d1 migrations apply DB --local     # try it locally
+npx wrangler d1 migrations apply DB --remote    # then production
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+D1 rejects queries with more than 100 bound parameters, so run queries with long `IN`
+lists through `inChunks()` from `src/lib/prisma.ts`.
