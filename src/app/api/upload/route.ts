@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
   try {
     // The bucket is bound to the Worker (ARTICLE_IMAGES in wrangler.jsonc), so no API keys are needed.
     await getCloudflareContext().env.ARTICLE_IMAGES.put(filename, await file.arrayBuffer(), {
-      httpMetadata: { contentType: file.type },
+      // Every filename is unique and never overwritten, so browsers and the CDN can cache it for 30 days.
+      httpMetadata: { contentType: file.type, cacheControl: "public, max-age=2592000" },
     });
   } catch (error) {
     console.error("R2 upload failed", error);

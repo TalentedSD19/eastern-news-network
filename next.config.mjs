@@ -14,6 +14,12 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "images.easternnewsnetwork.com",
+        pathname: "/**",
+      },
+      // Images uploaded before the custom domain still link to the bucket's r2.dev URL
+      {
+        protocol: "https",
         hostname: "pub-*.r2.dev",
         pathname: "/**",
       },

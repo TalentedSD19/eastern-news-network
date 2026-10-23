@@ -25,7 +25,8 @@
 		}
 	],
 	"vars": {
-		"R2_PUBLIC_URL": "https://pub-789a8d0ff4b244d6bdb9408b87d3c3e0.r2.dev",
+		// The bucket's custom domain: cached by Cloudflare's CDN, unlike the rate-limited r2.dev URL
+		"R2_PUBLIC_URL": "https://images.easternnewsnetwork.com",
 		// NextAuth builds its URLs from the request's host instead of NEXTAUTH_URL, so the same
 		// Worker serves the workers.dev address and the real domain. Cloudflare sets the host.
 		"AUTH_TRUST_HOST": "true"
