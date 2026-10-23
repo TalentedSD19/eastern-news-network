@@ -5,7 +5,8 @@ import SiteHeader from "@/components/public/SiteHeader";
 import SiteFooter from "@/components/public/SiteFooter";
 import type { ArticleWithRelations } from "@/types";
 
-export default async function EditArticlePage({ params }: { params: { id: string } }) {
+export default async function EditArticlePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const [article, categories] = await Promise.all([
     prisma.article.findUnique({
       where: { id: params.id },

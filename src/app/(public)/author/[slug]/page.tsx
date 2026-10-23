@@ -25,7 +25,8 @@ async function resolveByline(slug: string): Promise<string | null> {
   return Array.from(bylines).find((name) => slugify(name) === slug) ?? null;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const byline = await resolveByline(params.slug);
   if (!byline) notFound();
 
@@ -45,13 +46,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function AuthorPage({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams: { page?: string };
+export default async function AuthorPage(props: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const byline = await resolveByline(params.slug);
   if (!byline) notFound();
 

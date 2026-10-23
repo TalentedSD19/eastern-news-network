@@ -36,11 +36,10 @@ export const metadata: Metadata = {
 const FRONT_PAGE_SIZE = 14;
 const PAGE_SIZE = 16;
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: { page?: string };
+export default async function HomePage(props: {
+  searchParams: Promise<{ page?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
   const take = page === 1 ? FRONT_PAGE_SIZE : PAGE_SIZE;
   const skip = page === 1 ? 0 : FRONT_PAGE_SIZE + (page - 2) * PAGE_SIZE;

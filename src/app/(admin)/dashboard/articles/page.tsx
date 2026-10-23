@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { BarChart3, CheckCircle2, ImageIcon, MessageSquare, Plus, ThumbsDown, ThumbsUp, X, type LucideIcon } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { inChunks, prisma } from "@/lib/prisma";
 import { cn, formatDate } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,20 +19,19 @@ const STATUS_TABS = [
   { value: "DRAFT", label: "Drafts" },
 ] as const;
 
-export default async function ArticlesListPage({
-  searchParams,
-}: {
-  searchParams: { q?: string; status?: string; published?: string };
+export default async function ArticlesListPage(props: {
+  searchParams: Promise<{ q?: string; status?: string; published?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const q = searchParams.q?.trim();
   const status = STATUS_TABS.find((t) => t.value === searchParams.status)?.value;
 
   const searchWhere: Prisma.ArticleWhereInput = q
     ? {
         OR: [
-          { title: { contains: q, mode: "insensitive" } },
-          { category: { name: { contains: q, mode: "insensitive" } } },
-          { reporterName: { contains: q, mode: "insensitive" } },
+          { title: { contains: q } },
+          { category: { name: { contains: q } } },
+          { reporterName: { contains: q } },
         ],
       }
     : {};
@@ -63,11 +62,15 @@ export default async function ArticlesListPage({
     : null;
 
   const [voteRows, dailyViews, allIds] = await Promise.all([
-    prisma.vote.groupBy({
-      by: ["articleId", "voteType"],
-      where: { articleId: { in: articles.map((a) => a.id) } },
-      _count: { id: true },
-    }),
+    Promise.all(
+      inChunks(articles.map((a) => a.id)).map((ids) =>
+        prisma.vote.groupBy({
+          by: ["articleId", "voteType"],
+          where: { articleId: { in: ids } },
+          _count: { id: true },
+        })
+      )
+    ).then((chunks) => chunks.flat()),
     getLifetimeDailyViews(articles),
     // Every article's id oldest-first, so an article keeps its number while searching/filtering.
     filtered ? prisma.article.findMany({ select: { id: true }, orderBy: { createdAt: "asc" } }) : null,

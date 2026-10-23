@@ -47,8 +47,8 @@ export async function getSimilarArticles({
           status: "PUBLISHED",
           id: { notIn: excludeIds },
           OR: keywords.flatMap((word) => [
-            { title: { contains: word, mode: "insensitive" as const } },
-            { seoKeywords: { contains: word, mode: "insensitive" as const } },
+            { title: { contains: word } },
+            { seoKeywords: { contains: word } },
           ]),
         },
         include,

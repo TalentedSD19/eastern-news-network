@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const comments = await prisma.comment.findMany({
     where: { articleId: params.id },
     orderBy: { createdAt: "desc" },
@@ -12,10 +10,8 @@ export async function GET(
   return NextResponse.json(comments);
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const body = await request.json();
   const authorName = (body.authorName ?? "").trim().slice(0, 100);
   const text = (body.body ?? "").trim().slice(0, 2000);

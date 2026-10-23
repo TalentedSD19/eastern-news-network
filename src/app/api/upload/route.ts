@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { authOptions } from "@/lib/auth";
-import { getR2 } from "@/lib/supabase";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -16,11 +15,11 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const r2 = getR2();
-  if (r2.missing) {
-    console.error(`Upload failed: missing env ${r2.missing.join(", ")}`);
+  const publicUrl = process.env.R2_PUBLIC_URL?.replace(/\/$/, "");
+  if (!publicUrl) {
+    console.error("Upload failed: missing env R2_PUBLIC_URL");
     return NextResponse.json(
-      { error: `Image storage isn't configured on this server (missing ${r2.missing.join(", ")}).` },
+      { error: "Image storage isn't configured on this server (missing R2_PUBLIC_URL)." },
       { status: 500 }
     );
   }
@@ -35,15 +34,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "File too large (max 5 MB)" }, { status: 400 });
 
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
 
   try {
-    await r2.client.send(new PutObjectCommand({
-      Bucket: r2.bucket,
-      Key: filename,
-      Body: buffer,
-      ContentType: file.type,
-    }));
+    // The bucket is bound to the Worker (ARTICLE_IMAGES in wrangler.jsonc), so no API keys are needed.
+    await getCloudflareContext().env.ARTICLE_IMAGES.put(filename, await file.arrayBuffer(), {
+      httpMetadata: { contentType: file.type },
+    });
   } catch (error) {
     console.error("R2 upload failed", error);
     const detail = error instanceof Error ? ` (${error.name}: ${error.message})` : "";
@@ -54,5 +50,5 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ url: `${r2.publicUrl}/${filename}` });
+  return NextResponse.json({ url: `${publicUrl}/${filename}` });
 }

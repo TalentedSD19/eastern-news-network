@@ -1,7 +1,17 @@
-import { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/lib/prisma-runtime";
+import { inChunks, prisma } from "@/lib/prisma";
 
 export type DayRange = number | null; // null = all time
+
+// SQLite (D1) has no time zones; IST is a fixed UTC+5:30 with no daylight saving,
+// so shifting with these strftime() modifiers is exact.
+const IST = Prisma.sql`'+5 hours', '+30 minutes'`;
+
+// date() results usually come back as "yyyy-mm-dd" text, but the D1 adapter can turn
+// date-shaped text into a Date, so accept either.
+function dayKey(day: string | Date): string {
+  return typeof day === "string" ? day.slice(0, 10) : day.toISOString().slice(0, 10);
+}
 
 function rangeStart(days: DayRange): Date {
   if (days === null) return new Date(0);
@@ -107,8 +117,8 @@ function weightedMovingAverage(values: number[], index: number, window = WMA_WIN
 export async function getViewsOverTime(days: DayRange, authorFilter?: string): Promise<DailyViews[]> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  const rows = await prisma.$queryRaw<{ day: Date; views: bigint }[]>`
-    SELECT date_trunc('day', v."viewedAt") AS day, COUNT(*)::bigint AS views
+  const rows = await prisma.$queryRaw<{ day: string | Date; views: number }[]>`
+    SELECT date(v."viewedAt") AS day, COUNT(*) AS views
     FROM "ArticleView" v
     JOIN "Article" a ON a.id = v."articleId"
     LEFT JOIN "User" u ON u.id = a."authorId"
@@ -118,7 +128,7 @@ export async function getViewsOverTime(days: DayRange, authorFilter?: string): P
     ORDER BY day ASC
   `;
 
-  const counts = new Map(rows.map((r) => [r.day.toISOString().slice(0, 10), Number(r.views)]));
+  const counts = new Map(rows.map((r) => [dayKey(r.day), Number(r.views)]));
 
   const spanDays = days ?? Math.max(1, Math.ceil((Date.now() - since.getTime()) / 86_400_000));
   const dates: string[] = [];
@@ -146,9 +156,9 @@ export interface HourlyViews {
 export async function getViewsByHour(days: DayRange, authorFilter?: string): Promise<HourlyViews[]> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  const rows = await prisma.$queryRaw<{ hour: number; views: bigint }[]>`
-    SELECT EXTRACT(HOUR FROM (v."viewedAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata'))::int AS hour,
-           COUNT(*)::bigint AS views
+  const rows = await prisma.$queryRaw<{ hour: number; views: number }[]>`
+    SELECT CAST(strftime('%H', v."viewedAt", ${IST}) AS INTEGER) AS hour,
+           COUNT(*) AS views
     FROM "ArticleView" v
     JOIN "Article" a ON a.id = v."articleId"
     LEFT JOIN "User" u ON u.id = a."authorId"
@@ -215,8 +225,8 @@ export async function getViewsByRegion(
 export async function getViewsByCategory(days: DayRange, authorFilter?: string): Promise<LabeledCount[]> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  const rows = await prisma.$queryRaw<{ category: string; views: bigint }[]>`
-    SELECT c.name AS category, COUNT(v.id)::bigint AS views
+  const rows = await prisma.$queryRaw<{ category: string; views: number }[]>`
+    SELECT c.name AS category, COUNT(v.id) AS views
     FROM "ArticleView" v
     JOIN "Article" a ON a.id = v."articleId"
     LEFT JOIN "User" u ON u.id = a."authorId"
@@ -343,16 +353,22 @@ export async function getLifetimeDailyViews(
   const series = new Map<string, DayCount[]>();
   if (articles.length === 0) return series;
 
-  const rows = await prisma.$queryRaw<{ articleId: string; day: Date; views: bigint }[]>`
-    SELECT v."articleId", date_trunc('day', v."viewedAt") AS day, COUNT(*)::bigint AS views
-    FROM "ArticleView" v
-    WHERE v."articleId" IN (${Prisma.join(articles.map((a) => a.id))})
-    GROUP BY v."articleId", day
-  `;
-  const counts = new Map(rows.map((r) => [`${r.articleId}|${r.day.toISOString().slice(0, 10)}`, Number(r.views)]));
+  const rows = (
+    await Promise.all(
+      inChunks(articles.map((a) => a.id)).map(
+        (chunk) => prisma.$queryRaw<{ articleId: string; day: string | Date; views: number }[]>`
+          SELECT v."articleId", date(v."viewedAt") AS day, COUNT(*) AS views
+          FROM "ArticleView" v
+          WHERE v."articleId" IN (${Prisma.join(chunk)})
+          GROUP BY v."articleId", day
+        `
+      )
+    )
+  ).flat();
+  const counts = new Map(rows.map((r) => [`${r.articleId}|${dayKey(r.day)}`, Number(r.views)]));
   const firstViewDay = new Map<string, number>();
   for (const r of rows) {
-    const t = r.day.getTime();
+    const t = new Date(`${dayKey(r.day)}T00:00:00Z`).getTime();
     if (t < (firstViewDay.get(r.articleId) ?? Infinity)) firstViewDay.set(r.articleId, t);
   }
 
@@ -459,7 +475,7 @@ export interface VisitorLoyalty {
 export async function getVisitorLoyalty(days: DayRange, authorFilter?: string): Promise<VisitorLoyalty> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  const rows = await prisma.$queryRaw<{ returning: bigint; new_visitors: bigint }[]>`
+  const rows = await prisma.$queryRaw<{ returning: number | null; new_visitors: number | null }[]>`
     WITH visitor_first_seen AS (
       SELECT v."visitorId", MIN(v."viewedAt") AS first_seen
       FROM "ArticleView" v
@@ -478,8 +494,8 @@ export async function getVisitorLoyalty(days: DayRange, authorFilter?: string): 
       ${authorFrag}
     )
     SELECT
-      SUM(CASE WHEN vfs.first_seen < ${since} THEN 1 ELSE 0 END)::bigint AS returning,
-      SUM(CASE WHEN vfs.first_seen >= ${since} THEN 1 ELSE 0 END)::bigint AS new_visitors
+      SUM(CASE WHEN vfs.first_seen < ${since} THEN 1 ELSE 0 END) AS "returning",
+      SUM(CASE WHEN vfs.first_seen >= ${since} THEN 1 ELSE 0 END) AS new_visitors
     FROM active_this_period ap
     JOIN visitor_first_seen vfs ON vfs."visitorId" = ap."visitorId"
   `;
@@ -495,10 +511,12 @@ const PUBLISH_CURVE_MAX_DAY = 13; // 0..13 individually, 14+ folded into one buc
 export async function getViewsSincePublish(days: DayRange, authorFilter?: string): Promise<LabeledCount[]> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  const rows = await prisma.$queryRaw<{ day_offset: bigint; views: bigint }[]>`
+  // Integer division of whole seconds floors the (never negative) gap to whole days;
+  // two-argument MIN() is SQLite's scalar minimum.
+  const rows = await prisma.$queryRaw<{ day_offset: number; views: number }[]>`
     SELECT
-      LEAST(FLOOR(EXTRACT(EPOCH FROM (v."viewedAt" - a."publishedAt")) / 86400)::int, ${PUBLISH_CURVE_MAX_DAY + 1}) AS day_offset,
-      COUNT(*)::bigint AS views
+      MIN((unixepoch(v."viewedAt") - unixepoch(a."publishedAt")) / 86400, ${PUBLISH_CURVE_MAX_DAY + 1}) AS day_offset,
+      COUNT(*) AS views
     FROM "ArticleView" v
     JOIN "Article" a ON a.id = v."articleId"
     LEFT JOIN "User" u ON u.id = a."authorId"
@@ -509,8 +527,6 @@ export async function getViewsSincePublish(days: DayRange, authorFilter?: string
     GROUP BY day_offset
     ORDER BY day_offset ASC
   `;
-  // day_offset comes back as BigInt (Postgres infers int8 for the LEAST(...) result here) —
-  // must coerce before using as a plain-number Map key, or every lookup below silently misses.
   const counts = new Map(rows.map((r) => [Number(r.day_offset), Number(r.views)]));
   return Array.from({ length: PUBLISH_CURVE_MAX_DAY + 2 }, (_, day) => ({
     label: day > PUBLISH_CURVE_MAX_DAY ? `Day ${PUBLISH_CURVE_MAX_DAY + 1}+` : `Day ${day}`,
@@ -555,10 +571,10 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 export async function getViewsByWeekday(days: DayRange, authorFilter?: string): Promise<LabeledCount[]> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  // ISODOW: 1 = Monday … 7 = Sunday
-  const rows = await prisma.$queryRaw<{ dow: number; views: bigint }[]>`
-    SELECT EXTRACT(ISODOW FROM (v."viewedAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata'))::int AS dow,
-           COUNT(*)::bigint AS views
+  // strftime('%w') counts from 0 = Sunday; shifted to 1 = Monday … 7 = Sunday
+  const rows = await prisma.$queryRaw<{ dow: number; views: number }[]>`
+    SELECT (CAST(strftime('%w', v."viewedAt", ${IST}) AS INTEGER) + 6) % 7 + 1 AS dow,
+           COUNT(*) AS views
     FROM "ArticleView" v
     JOIN "Article" a ON a.id = v."articleId"
     LEFT JOIN "User" u ON u.id = a."authorId"
@@ -583,27 +599,27 @@ export interface AuthorStats {
 export async function getAuthorLeaderboard(days: DayRange): Promise<AuthorStats[]> {
   const since = rangeStart(days);
   const [viewRows, publishedRows, reactionRows] = await Promise.all([
-    prisma.$queryRaw<{ byline: string; views: bigint; articles: bigint; tracked: bigint; completed: bigint }[]>`
+    prisma.$queryRaw<{ byline: string; views: number; articles: number; tracked: number; completed: number }[]>`
       SELECT COALESCE(a."reporterName", u.name) AS byline,
-             COUNT(*)::bigint AS views,
-             COUNT(DISTINCT v."articleId")::bigint AS articles,
-             COUNT(*) FILTER (WHERE v."maxScrollPct" IS NOT NULL)::bigint AS tracked,
-             COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80)::bigint AS completed
+             COUNT(*) AS views,
+             COUNT(DISTINCT v."articleId") AS articles,
+             COUNT(*) FILTER (WHERE v."maxScrollPct" IS NOT NULL) AS tracked,
+             COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80) AS completed
       FROM "ArticleView" v
       JOIN "Article" a ON a.id = v."articleId"
       LEFT JOIN "User" u ON u.id = a."authorId"
       WHERE v."viewedAt" >= ${since}
       GROUP BY byline
     `,
-    prisma.$queryRaw<{ byline: string; published: bigint }[]>`
-      SELECT COALESCE(a."reporterName", u.name) AS byline, COUNT(*)::bigint AS published
+    prisma.$queryRaw<{ byline: string; published: number }[]>`
+      SELECT COALESCE(a."reporterName", u.name) AS byline, COUNT(*) AS published
       FROM "Article" a
       LEFT JOIN "User" u ON u.id = a."authorId"
       WHERE a.status = 'PUBLISHED' AND a."publishedAt" >= ${since}
       GROUP BY byline
     `,
-    prisma.$queryRaw<{ byline: string; reactions: bigint }[]>`
-      SELECT COALESCE(a."reporterName", u.name) AS byline, COUNT(*)::bigint AS reactions
+    prisma.$queryRaw<{ byline: string; reactions: number }[]>`
+      SELECT COALESCE(a."reporterName", u.name) AS byline, COUNT(*) AS reactions
       FROM (
         SELECT "articleId" FROM "Comment" WHERE "createdAt" >= ${since}
         UNION ALL
@@ -652,10 +668,10 @@ const MIN_TRACKED_VIEWS_FOR_COMPLETION = 20;
 export async function getMostDiscussed(days: DayRange, authorFilter?: string, limit = 5): Promise<ArticleScore[]> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  const rows = await prisma.$queryRaw<{ id: string; title: string; byline: string; comments: bigint; total: bigint }[]>`
+  const rows = await prisma.$queryRaw<{ id: string; title: string; byline: string; comments: number; total: number }[]>`
     SELECT a.id, a.title, COALESCE(a."reporterName", u.name) AS byline,
-           COUNT(*) FILTER (WHERE r.kind = 'comment')::bigint AS comments,
-           COUNT(*)::bigint AS total
+           COUNT(*) FILTER (WHERE r.kind = 'comment') AS comments,
+           COUNT(*) AS total
     FROM (
       SELECT "articleId", 'comment' AS kind FROM "Comment" WHERE "createdAt" >= ${since}
       UNION ALL
@@ -678,10 +694,10 @@ export async function getMostDiscussed(days: DayRange, authorFilter?: string, li
 export async function getBestCompletion(days: DayRange, authorFilter?: string, limit = 5): Promise<ArticleScore[]> {
   const since = rangeStart(days);
   const authorFrag = authorFilterFragment(authorFilter);
-  const rows = await prisma.$queryRaw<{ id: string; title: string; byline: string; tracked: bigint; completed: bigint }[]>`
+  const rows = await prisma.$queryRaw<{ id: string; title: string; byline: string; tracked: number; completed: number }[]>`
     SELECT a.id, a.title, COALESCE(a."reporterName", u.name) AS byline,
-           COUNT(*)::bigint AS tracked,
-           COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80)::bigint AS completed
+           COUNT(*) AS tracked,
+           COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80) AS completed
     FROM "ArticleView" v
     JOIN "Article" a ON a.id = v."articleId"
     LEFT JOIN "User" u ON u.id = a."authorId"
@@ -689,7 +705,7 @@ export async function getBestCompletion(days: DayRange, authorFilter?: string, l
     ${authorFrag}
     GROUP BY a.id, a.title, byline
     HAVING COUNT(*) >= ${MIN_TRACKED_VIEWS_FOR_COMPLETION}
-    ORDER BY COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80)::float / COUNT(*) DESC, COUNT(*) DESC
+    ORDER BY CAST(COUNT(*) FILTER (WHERE v."maxScrollPct" >= 80) AS REAL) / COUNT(*) DESC, COUNT(*) DESC
     LIMIT ${limit}
   `;
   return rows.map((r) => ({
@@ -714,8 +730,8 @@ export async function getCategoryComparison(article: {
   categoryId: string;
   category: { name: string };
 }): Promise<CategoryComparison> {
-  const rows = await prisma.$queryRaw<{ id: string; views: bigint }[]>`
-    SELECT a.id, COUNT(v.id)::bigint AS views
+  const rows = await prisma.$queryRaw<{ id: string; views: number }[]>`
+    SELECT a.id, COUNT(v.id) AS views
     FROM "Article" a
     LEFT JOIN "ArticleView" v ON v."articleId" = a.id
     WHERE a."categoryId" = ${article.categoryId} AND a.status = 'PUBLISHED'

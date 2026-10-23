@@ -9,9 +9,9 @@ export async function GET(req: NextRequest) {
     where: {
       status: "PUBLISHED",
       OR: [
-        { title: { contains: q, mode: "insensitive" } },
-        { excerpt: { contains: q, mode: "insensitive" } },
-        { reporterName: { contains: q, mode: "insensitive" } },
+        { title: { contains: q } },
+        { excerpt: { contains: q } },
+        { reporterName: { contains: q } },
       ],
     },
     select: {

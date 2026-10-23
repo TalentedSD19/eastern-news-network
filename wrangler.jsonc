@@ -1,0 +1,46 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "eastern-news-network",
+	"compatibility_date": "2026-10-19",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	// esbuild's keep_names wraps functions in __name(...) calls. Functions that Next.js
+	// serialises into inline <script> tags (e.g. the theme script) then reference a
+	// __name helper the browser doesn't have, and throw "__name is not defined".
+	"keep_names": false,
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true
+	},
+	"r2_buckets": [
+		{
+			// Images uploaded from the editor, served publicly from R2_PUBLIC_URL
+			"binding": "ARTICLE_IMAGES",
+			"bucket_name": "article-images",
+			// The real bucket in dev too, so uploaded images show up at their public URL
+			"remote": true
+		}
+	],
+	"vars": {
+		"R2_PUBLIC_URL": "https://pub-789a8d0ff4b244d6bdb9408b87d3c3e0.r2.dev",
+		// NextAuth builds its URLs from the request's host instead of NEXTAUTH_URL, so the same
+		// Worker serves the workers.dev address and the real domain. Cloudflare sets the host.
+		"AUTH_TRUST_HOST": "true"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "eastern-news-network",
+			"database_id": "700bb14f-6e22-416a-854c-3c607fc281ab",
+			// SQL files generated with `prisma migrate diff`, applied with `wrangler d1 migrations apply`
+			"migrations_dir": "prisma/migrations"
+		}
+	]
+	// No "images" binding on purpose: Cloudflare Images bills per transformation,
+	// and without it /_next/image serves the original file untouched.
+	// Secrets (NEXTAUTH_SECRET, VAPID_PRIVATE_KEY) are set with `wrangler secret put`, never
+	// here or in .env files: the build bundles every .env value into the Worker.
+}

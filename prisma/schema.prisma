@@ -1,11 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "client"
 }
 
+// Production runs on Cloudflare D1 through @prisma/adapter-d1 (see src/lib/prisma.ts).
+// The url is only used by Prisma CLI commands, which work against a local SQLite file.
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
