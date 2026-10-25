@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { doneProgress, startProgress, useProgressRouter } from "@/lib/navigationProgress";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 type Category = { id: string; name: string; slug: string };
 
 export default function CategoryManager({ initialCategories }: { initialCategories: Category[] }) {
-  const router = useRouter();
+  const router = useProgressRouter();
   const [categories, setCategories] = useState(initialCategories);
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
@@ -18,15 +18,17 @@ export default function CategoryManager({ initialCategories }: { initialCategori
     e.preventDefault();
     setAdding(true);
     setError("");
+    startProgress();
     const res = await fetch("/api/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
-    });
-    const data = await res.json();
+    }).catch(() => null);
+    const data = await res?.json().catch(() => ({}));
     setAdding(false);
-    if (!res.ok) {
-      setError(data.error ?? "Failed to add category");
+    if (!res?.ok) {
+      doneProgress();
+      setError(data?.error ?? "Failed to add category");
     } else {
       setCategories((prev) => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
       setName("");
@@ -36,10 +38,12 @@ export default function CategoryManager({ initialCategories }: { initialCategori
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this category?")) return;
-    const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error ?? "Failed to delete");
+    startProgress();
+    const res = await fetch(`/api/categories/${id}`, { method: "DELETE" }).catch(() => null);
+    const data = await res?.json().catch(() => ({}));
+    if (!res?.ok) {
+      doneProgress();
+      alert(data?.error ?? "Failed to delete");
     } else {
       setCategories((prev) => prev.filter((c) => c.id !== id));
       router.refresh();

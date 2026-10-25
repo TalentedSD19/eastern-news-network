@@ -8,6 +8,7 @@ import { signOut } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
+import { startProgress } from "@/lib/navigationProgress";
 
 const navItems = [
   { href: "/dashboard/articles", label: "Articles" },
@@ -24,6 +25,11 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  function handleSignOut() {
+    startProgress();
+    signOut({ callbackUrl: "/login" });
+  }
 
   const avatar = (
     <div className="relative w-8 h-8 rounded-full overflow-hidden bg-brand-accent shrink-0 flex items-center justify-center">
@@ -90,7 +96,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
             </nav>
             <div className="px-3 py-3 border-t border-white/10">
               <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={handleSignOut}
                 className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-white/10 transition-colors"
               >
                 Sign out
@@ -147,7 +153,7 @@ export default function AdminSidebar({ userName, avatarUrl }: AdminSidebarProps)
 
         <div className="px-3 py-4 border-t border-white/10 flex items-center gap-1">
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={handleSignOut}
             className="flex-1 text-left px-3 py-2 rounded-md text-sm text-gray-300 hover:bg-white/10 transition-colors"
           >
             Sign out

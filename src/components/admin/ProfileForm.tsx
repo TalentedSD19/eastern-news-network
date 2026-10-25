@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { uploadImage } from "@/lib/uploadImage";
+import { doneProgress, startProgress, useProgressRouter } from "@/lib/navigationProgress";
 
 interface ProfileData {
   id: string;
@@ -15,6 +16,7 @@ interface ProfileData {
 }
 
 export default function ProfileForm({ initial }: { initial: ProfileData }) {
+  const router = useProgressRouter();
   const [name, setName] = useState(initial.name);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(initial.avatarUrl);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -51,6 +53,7 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
     }
 
     setSaving(true);
+    startProgress();
     try {
       const body: Record<string, unknown> = { name, avatarUrl };
       if (newPassword) {
@@ -69,8 +72,11 @@ export default function ProfileForm({ initial }: { initial: ProfileData }) {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setMessage({ type: "success", text: "Profile updated. Refresh the page to see your new name in the sidebar." });
+      setMessage({ type: "success", text: "Profile updated." });
+      // Re-renders the sidebar with the new name and photo; the bar finishes when it has.
+      router.refresh();
     } catch (err: unknown) {
+      doneProgress();
       setMessage({ type: "error", text: err instanceof Error ? err.message : "Save failed" });
     } finally {
       setSaving(false);

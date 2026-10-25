@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { doneProgress, startProgress, useProgressRouter } from "@/lib/navigationProgress";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function PublishToggleButton({ id, currentStatus }: Props) {
-  const router = useRouter();
+  const router = useProgressRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,15 +18,17 @@ export default function PublishToggleButton({ id, currentStatus }: Props) {
     setLoading(true);
     setError(null);
     const newStatus = currentStatus === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+    startProgress();
     const res = await fetch(`/api/articles/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),
-    });
+    }).catch(() => null);
     setLoading(false);
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Couldn't update the article.");
+    if (!res?.ok) {
+      doneProgress();
+      const data = await res?.json().catch(() => ({}));
+      setError(data?.error ?? "Couldn't update the article.");
       return;
     }
     router.refresh();

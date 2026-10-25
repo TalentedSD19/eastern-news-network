@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useMemo, useCallback, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { doneProgress, startProgress, useProgressRouter } from "@/lib/navigationProgress";
 import dynamic from "next/dynamic";
 import type { Editor } from "@tiptap/core";
 import Image from "next/image";
@@ -130,7 +130,7 @@ const selectClass =
   "flex h-9 w-full rounded-md border border-input bg-transparent dark:bg-input/30 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring";
 
 export default function ArticleForm({ article, categories, authorName, siteHeader, siteFooter }: Props) {
-  const router = useRouter();
+  const router = useProgressRouter();
   const editorRef = useRef<Editor | null>(null);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -296,6 +296,7 @@ export default function ArticleForm({ article, categories, authorName, siteHeade
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
     setSaving(nextStatus);
     setError("");
+    startProgress();
 
     const json = JSON.stringify({ ...JSON.parse(payloadJson), status: nextStatus });
 
@@ -307,6 +308,7 @@ export default function ArticleForm({ article, categories, authorName, siteHeade
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        doneProgress();
         setError(data.error ?? "Something went wrong. Please try again.");
         setSaving(null);
         return;
@@ -331,6 +333,7 @@ export default function ArticleForm({ article, categories, authorName, siteHeade
         router.refresh();
       }
     } catch {
+      doneProgress();
       setError("Couldn't reach the server. Check your connection and try again.");
       setSaving(null);
     }

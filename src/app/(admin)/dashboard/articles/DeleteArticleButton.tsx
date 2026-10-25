@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { doneProgress, startProgress, useProgressRouter } from "@/lib/navigationProgress";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function DeleteArticleButton({ id, title }: { id: string; title: string }) {
-  const router = useRouter();
+  const router = useProgressRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,10 +24,12 @@ export default function DeleteArticleButton({ id, title }: { id: string; title: 
   async function handleDelete() {
     setLoading(true);
     setError(null);
-    const res = await fetch(`/api/articles/${id}`, { method: "DELETE" });
+    startProgress();
+    const res = await fetch(`/api/articles/${id}`, { method: "DELETE" }).catch(() => null);
     setLoading(false);
-    if (!res.ok) {
-      setError(res.status === 403 ? "You can only delete your own articles." : "Couldn't delete the article. Try again.");
+    if (!res?.ok) {
+      doneProgress();
+      setError(res?.status === 403 ? "You can only delete your own articles." : "Couldn't delete the article. Try again.");
       return;
     }
     setOpen(false);

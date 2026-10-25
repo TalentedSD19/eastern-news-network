@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import "./globals.css";
@@ -97,7 +98,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationJsonLd) }}
         />
         <Providers>
-          <NavigationProgress />
+          {/* useSearchParams() needs a Suspense boundary, or every page would render client-side only */}
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           {children}
         </Providers>
       </body>

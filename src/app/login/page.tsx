@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { doneProgress, startProgress, useProgressRouter } from "@/lib/navigationProgress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useProgressRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,6 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    startProgress();
 
     const result = await signIn("credentials", {
       email,
@@ -26,10 +27,12 @@ export default function LoginPage() {
       redirect: false,
     });
 
-    setLoading(false);
     if (result?.error) {
+      setLoading(false);
+      doneProgress();
       setError("Invalid email or password");
     } else {
+      // Stays "Signing in…" until the dashboard replaces this page.
       router.push("/dashboard/articles");
       router.refresh();
     }

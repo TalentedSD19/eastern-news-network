@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
+import { useProgressRouter } from "@/lib/navigationProgress";
 
 interface Props {
   authors: string[];
@@ -8,7 +9,7 @@ interface Props {
 }
 
 export default function AuthorFilterSelect({ authors, activeAuthor }: Props) {
-  const router = useRouter();
+  const router = useProgressRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
