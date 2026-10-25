@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useProgressRouter } from "@/lib/navigationProgress";
 import { TableRow } from "@/components/ui/table";
 
 // Table row that opens the article's edit page when clicked anywhere outside its own buttons/links.
 export default function ArticleRow({ href, children }: { href: string; children: React.ReactNode }) {
-  const router = useRouter();
+  const router = useProgressRouter();
 
   function handleClick(e: React.MouseEvent<HTMLTableRowElement>) {
     const target = e.target as HTMLElement;

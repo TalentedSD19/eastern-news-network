@@ -39,7 +39,30 @@
 			// SQL files generated with `prisma migrate diff`, applied with `wrangler d1 migrations apply`
 			"migrations_dir": "prisma/migrations"
 		}
-	]
+	],
+	// Branch builds deploy with `wrangler preview`, which uses these instead of the bindings above,
+	// so publishing or deleting in a preview never touches the live site.
+	"previews": {
+		"vars": {
+			// The preview bucket has no custom domain, so its rate-limited r2.dev URL serves images
+			"R2_PUBLIC_URL": "https://pub-d6d79984711a45c1a6f113cbc4cd6bb3.r2.dev",
+			"AUTH_TRUST_HOST": "true"
+		},
+		"d1_databases": [
+			{
+				"binding": "DB",
+				"database_name": "eastern-news-network-preview",
+				"database_id": "eae28922-0f8f-4e52-ac00-984491e301ac",
+				"migrations_dir": "prisma/migrations"
+			}
+		],
+		"r2_buckets": [
+			{
+				"binding": "ARTICLE_IMAGES",
+				"bucket_name": "article-images-preview"
+			}
+		]
+	}
 	// No "images" binding on purpose: Cloudflare Images bills per transformation,
 	// and without it /_next/image serves the original file untouched.
 	// Secrets (NEXTAUTH_SECRET, VAPID_PRIVATE_KEY) are set with `wrangler secret put`, never
